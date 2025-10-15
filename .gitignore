@@ -195,3 +195,7 @@ Thumbs.db
 
 # (Opcional) Docker override local
 docker-compose.override.yml
+
+
+#Ignore insiders AI rules
+.github\instructions\codacy.instructions.md
