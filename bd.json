@@ -1,0 +1,106 @@
+{"tables": [
+    {
+        "name": "jogador",
+        "primary_kay": ["id_jogador"],
+        "columns": [
+            {"name": "id_jogador", "type": "INTEGER", "constraints": ["PK", "AUTOINCREMENT"] },
+            {"name": "nome", "type": "VARCHAR(100)", "constraints": ["NOT NULL"] },
+            {"name": "email", "type": "VARCHAR(150)", "constraints": ["NULL"] },
+            {"name": "criado_em", "type": "DATETIME", "constraints": ["DEFAULT CURRENT_TIMESTAMP"] }
+        ]
+    },
+    {
+        "name": "sessao",
+        "primary_kay": ["id_sessao"],
+        "columns":[
+            {"name": "id_sessao", "type": "VARCHAR(36)", "constraints": ["PK"] },
+            {"name": "id_jogador", "type": "INTEGER", "constraints": ["NOT NULL", "FK -> jogador.id_jogador"] },
+            {"name": "inicio_em", "type": "DATETIME", "constraints": ["DEFAULT CURRENT_TIMESTAMP"] },
+            {"name": "fim_em", "type": "DATETIME", "constraints": ["NULL"] },
+            {"name": "posicao_atual", "type":"INTEGER", "constraints": ["DEFAULT 0"] },
+            {"name": "pontuacao_total", "type":"INTEGER", "constraints": ["DEFAULT 0"] },
+            {"name": "status", "type": "VARCHAR(20)", "constraints": ["DEFAULT 'EM_ANDAMENTO' "] }
+        ]
+    },
+    {
+        "name": "desafio",
+        "primary_kay": ["id_desafio"],
+        "columns": [
+            {"name": "id_desafio", "type": "VARCHAR(30)", "constraints": ["PK"] },
+            {"name": "tipo", "type": "VARCHAR(20)", "constraints": ["NOT NULL"], "description": "QUIZ ou PROVA"},
+            {"name": "enunciado", "type": "TEXT", "constraints": ["NOT NULL"] },
+            {"name": "resposta_correta", "type": "INTEGER", "constraints": ["NULL"], "description": "índice da alternativa quando for QUIZ"},
+            {"name": "explicacao", "type":"TEXT", "constraints": ["NULL"] },
+            {"name": "valor_pontos", "type":"INTEGER", "constraints": ["DEFAULT 10"] },
+            {"name": "conteudo", "type": "VARCHAR(50)", "constraints": ["NULL"], "description": "ex.: 'rice', 'decidibilidade' "}
+        ]
+    },
+    {
+        "name": "tentativa",
+        "primary_kay": ["id_tentativa"],
+        "columns":[
+            {"name": "id_tentativa", "type": "INTEGER", "constraints": ["PK", "AUTOINCREMENT"] },
+            {"name": "id_sessao", "type": "VARCHAR(36)", "constraints": ["NOT NULL", "FK -> sessao.id_sessao"] },
+            { "name": "id_desafio", "type": "VARCHAR(30)", "constraints": ["NOT NULL", "FK -> desafio.id_desafio"] },
+        { "name": "resposta_jogador", "type": "INTEGER", "constraints": ["NULL"] },
+        { "name": "correta", "type": "BOOLEAN", "constraints": ["NOT NULL"] },
+        { "name": "pontos_obtidos", "type": "INTEGER", "constraints": ["NOT NULL", "DEFAULT 0"] },
+        { "name": "respondido_em", "type": "DATETIME", "constraints": ["DEFAULT CURRENT_TIMESTAMP"] }
+      ]
+    },
+    {
+      "name": "movimento_tabuleiro",
+      "primary_key": ["id_movimento"],
+      "columns": [
+        { "name": "id_movimento", "type": "INTEGER", "constraints": ["PK", "AUTOINCREMENT"] },
+        { "name": "id_sessao", "type": "VARCHAR(36)", "constraints": ["NOT NULL", "FK -> sessao.id_sessao"] },
+        { "name": "posicao_anterior", "type": "INTEGER", "constraints": ["NOT NULL"] },
+        { "name": "posicao_nova", "type": "INTEGER", "constraints": ["NOT NULL"] },
+        { "name": "valor_dado", "type": "INTEGER", "constraints": ["NOT NULL"] },
+        { "name": "caiu_em", "type": "VARCHAR(20)", "constraints": ["NULL"], "description": "tipo da casa: QUIZ, PROVA, CHANCE" },
+        { "name": "criado_em", "type": "DATETIME", "constraints": ["DEFAULT CURRENT_TIMESTAMP"] }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "from_table": "sessao",
+      "from_column": "id_jogador",
+      "to_table": "jogador",
+      "to_column": "id_jogador",
+      "type": "N:1",
+      "description": "um jogador pode ter várias sessões de jogo"
+    },
+    {
+      "from_table": "tentativa",
+      "from_column": "id_sessao",
+      "to_table": "sessao",
+      "to_column": "id_sessao",
+      "type": "N:1",
+      "description": "uma sessão tem várias tentativas (respostas)"
+    },
+    {
+      "from_table": "tentativa",
+      "from_column": "id_desafio",
+      "to_table": "desafio",
+      "to_column": "id_desafio",
+      "type": "N:1",
+      "description": "cada tentativa corresponde a um desafio (quiz/prova)"
+    },
+    {
+      "from_table": "movimento_tabuleiro",
+      "from_column": "id_sessao",
+      "to_table": "sessao",
+      "to_column": "id_sessao",
+      "type": "N:1",
+      "description": "cada movimento pertence a uma sessão de jogo"
+    }
+  ],
+  "permite": [
+    "Criar jogadores",
+    "Criar sessões/partidas por jogador",
+    "Registrar movimentos no tabuleiro",
+    "Registrar respostas (tentativas) a desafios",
+    "Somar pontos por sessão e mostrar leaderboard"
+  ]
+}

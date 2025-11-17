@@ -1,19 +1,89 @@
-from datetime import datetime
-from typing import Dict, Set
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, conint
+"""
+ComputerRak API — com SQLite + Autenticação simples
+Fluxo: /health, /launch, /score (persistidos em SQLite).
+Token fixo via header: X-API-Key: computerrak-dev
+"""
+
 from uuid import uuid4
+import sqlite3
 
-app = FastAPI(title="ComputerRak API", version="0.2.1")
+from fastapi import FastAPI, HTTPException, Depends, Header, status
+from pydantic import BaseModel
 
-# ---------- Models ----------
+DB_PATH = "computerrak.db"
+API_KEY = "computerrak-dev"
+
+app = FastAPI(title="ComputerRak API", version="0.4.0")
+
+
+# ---------------- AUTENTICAÇÃO ----------------
+def require_api_key(x_api_key: str | None = Header(default=None)):
+    """
+    Autenticação simples por token fixo em header.
+    Requisições sem token ou com token incorreto retornam 401.
+    """
+    if x_api_key != API_KEY:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token inválido ou ausente. Use header X-API-Key."
+        )
+
+
+# ---------------- DB ----------------
+def get_conn() -> sqlite3.Connection:
+    """Abre conexão com SQLite e garante FKs ativas."""
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute("PRAGMA foreign_keys = ON;")
+    return conn
+
+
+def init_db() -> None:
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        # sessões (partidas)
+        cur.execute(
+            """
+            CREATE TABLE IF NOT EXISTS sessions (
+                id_sessao  TEXT PRIMARY KEY,
+                user       TEXT NOT NULL,
+                position   INTEGER DEFAULT 0,
+                score      INTEGER DEFAULT 0,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
+            """
+        )
+        # tentativas (respostas)
+        cur.execute(
+            """
+            CREATE TABLE IF NOT EXISTS attempts (
+                id_attempt INTEGER PRIMARY KEY AUTOINCREMENT,
+                id_sessao  TEXT NOT NULL,
+                payload_id TEXT NOT NULL,
+                answer     INTEGER NOT NULL,
+                delta      INTEGER NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (id_sessao) REFERENCES sessions(id_sessao)
+            );
+            """
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+init_db()
+
+
+# ------------- MODELOS -------------
+class HealthResp(BaseModel):
+    status: str
+    service: str
+
+
 class LaunchReq(BaseModel):
     user: str
 
-class ScoreReq(BaseModel):
-    session_id: str
-    payload_id: str
-    answer: conint(ge=0)  # inteiro >= 0
 
 class LaunchResp(BaseModel):
     session_id: str
@@ -21,77 +91,131 @@ class LaunchResp(BaseModel):
     score: int
     message: str
 
+
+class ScoreReq(BaseModel):
+    session_id: str
+    payload_id: str
+    answer: int
+
+
 class ScoreResp(BaseModel):
     delta: int
     score: int
     explanation: str
     correct: bool
-    already_answered: bool
-    at: str  # ISO timestamp
 
-# ---------- In-memory state ----------
-# sessions[sid] = {"user": str, "position": int, "score": int, "answered": set[str]}
-sessions: Dict[str, Dict] = {}
 
-# Desafio mock: inclua "choices" para validar o índice
-challenges = {
+# desafio mock para validar /score
+CHALLENGES = {
     "q_001": {
         "correct": 1,
-        "choices": 3,  # há 3 alternativas (0,1,2)
-        "explanation": "Mestre: a=b=2 e f(n)=n ⇒ caso 2 ⇒ O(n log n).",
+        "explanation": "Mestre: a=b=2, f(n)=n ⇒ caso 2 ⇒ O(n log n).",
         "points": 10,
     }
 }
 
-# ---------- Endpoints ----------
-@app.get("/health")
+
+# ------------- ENDPOINTS -------------
+@app.get("/health", response_model=HealthResp, summary="Healthcheck público")
 def health():
+    """Verifica se o serviço está no ar (sem precisar de token)."""
     return {"status": "ok", "service": "computerrak-api"}
 
-@app.post("/launch", response_model=LaunchResp)
+
+@app.post(
+    "/launch",
+    response_model=LaunchResp,
+    summary="Criar partida/sessão",
+    dependencies=[Depends(require_api_key)],
+)
 def launch(req: LaunchReq):
-    sid = str(uuid4())
-    sessions[sid] = {"user": req.user, "position": 0, "score": 0, "answered": set()}  # type: ignore
-    return {"session_id": sid, "position": 0, "score": 0, "message": "partida iniciada"}
+    """
+    Cria nova sessão de jogo para um usuário.
+    Requer header X-API-Key com token válido.
+    """
+    session_id = str(uuid4())
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            "INSERT INTO sessions (id_sessao, user, position, score) VALUES (?, ?, 0, 0)",
+            (session_id, req.user),
+        )
+        conn.commit()
+    finally:
+        conn.close()
 
-@app.post("/score", response_model=ScoreResp)
+    return {
+        "session_id": session_id,
+        "position": 0,
+        "score": 0,
+        "message": "partida iniciada",
+    }
+
+
+@app.post(
+    "/score",
+    response_model=ScoreResp,
+    summary="Registrar resposta e pontuação",
+    dependencies=[Depends(require_api_key)],
+)
 def score(req: ScoreReq):
-    sess = sessions.get(req.session_id)
-    if not sess:
-        raise HTTPException(400, "session_id inválido")
+    """
+    Registra resposta de um desafio, calcula pontos e atualiza score da sessão.
+    Requer header X-API-Key com token válido.
+    """
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
 
-    ch = challenges.get(req.payload_id)
-    if not ch:
-        raise HTTPException(400, "payload_id desconhecido")
+        # buscar sessão
+        cur.execute(
+            "SELECT score FROM sessions WHERE id_sessao = ?",
+            (req.session_id,),
+        )
+        row = cur.fetchone()
+        if not row:
+            raise HTTPException(status_code=400, detail="session_id inválido")
 
-    # valida índice da resposta
-    if req.answer >= ch["choices"]:
-        raise HTTPException(422, f"answer deve estar entre 0 e {ch['choices']-1}")
+        current_score = row[0]
 
-    now = datetime.utcnow().isoformat() + "Z"
+        # desafio mock
+        ch = CHALLENGES.get(req.payload_id)
+        if not ch:
+            raise HTTPException(status_code=400, detail="payload_id desconhecido")
 
-    # evita pontuar duas vezes o mesmo desafio
-    answered: Set[str] = sess["answered"]
-    if req.payload_id in answered:
-        return {
-            "delta": 0,
-            "score": sess["score"],
-            "explanation": "Resposta já registrada para este desafio.",
-            "correct": (req.answer == ch["correct"]),
-            "already_answered": True,
-            "at": now,
-        }
+        correct = req.answer == ch["correct"]
+        delta = ch["points"] if correct else 0
+        new_score = current_score + delta
 
-    correct = (req.answer == ch["correct"])
-    delta = ch["points"] if correct else 0
-    sess["score"] += delta
-    answered.add(req.payload_id)
+        # atualizar score da sessão
+        cur.execute(
+            "UPDATE sessions SET score = ? WHERE id_sessao = ?",
+            (new_score, req.session_id),
+        )
+
+        # registrar tentativa
+        cur.execute(
+            """
+            INSERT INTO attempts (id_sessao, payload_id, answer, delta)
+            VALUES (?, ?, ?, ?)
+            """,
+            (req.session_id, req.payload_id, req.answer, delta),
+        )
+
+        conn.commit()
+    finally:
+        conn.close()
 
     return {
         "delta": delta,
-        "score": sess["score"],
+        "score": new_score,
         "explanation": ch["explanation"],
         "correct": correct,
-        "already_answered": False,
-        "at": now,
     }
+
+
+# opcional: evitar 404 do favicon no log
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    return {}
