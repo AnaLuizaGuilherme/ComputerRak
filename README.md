@@ -1,4 +1,4 @@
-# 🧠🎲 ComputerRak — Jogo de Tabuleiro Digital (Computabilidade)
+# ComputerRak — Jogo de Tabuleiro Digital (Computabilidade)
 
 > Plataforma gamificada para apoiar o estudo de **Computabilidade** e **Complexidade de Algoritmos**, utilizando um **tabuleiro digital**, quizzes e provas guiadas.  
 > Backend em **FastAPI**, Banco **SQLite**, Frontend em **Streamlit** (planejado) e empacotamento final em **Docker** (planejado).
@@ -9,6 +9,7 @@
 - **Fase 3** → Modelo relacional + persistência em **SQLite** + fluxo ponta a ponta (vídeo + mapa mental)  
 - **Fase 4** → Ajustes de objetivos, testes funcionais e autenticação simples  
 - **Fase 5** → Documentação: README completo, pronto para execução pelo usuário
+- **Fase 6** → Inserção da interface
 
 ---
 
@@ -41,7 +42,7 @@ Cada sessão (partida) representa um **estado computacional**, evoluindo conform
 
 ---
 
-# 🧩 Como o jogo favorece o aprendizado
+# Como o jogo favorece o aprendizado
 
 - Estimula **resolução de problemas**, compreensão de *por que* a resposta está correta.  
 - Conecta o aluno à teoria por meio de **exemplos contextualizados** e feedback imediato.  
@@ -50,11 +51,12 @@ Cada sessão (partida) representa um **estado computacional**, evoluindo conform
 
 ---
 
-# 🧰 Stack Tecnológica
+# Stack Tecnológica
 
 - **Python 3.11+**  
 - **FastAPI + Uvicorn** (backend)  
-- **SQLite** (persistência de sessões e tentativas) — **Fase 3**  
+- **SQLite** (persistência de sessões e tentativas) — **Fase 3**
+- **HTML** (frontend/tabuleiro digital)
 - **Streamlit** (frontend/tabuleiro digital) — **planejado para fases seguintes**  
 - **Docker** (empacotamento) — **planejado para fase final**  
 - **Git/GitHub** (controle de versão)  
@@ -64,21 +66,44 @@ Cada sessão (partida) representa um **estado computacional**, evoluindo conform
 # 🗂️ Estrutura Atual do Projeto
 
 ```text
-ComputerRak/
+.
+├── .github/
+│   └── instructions/
+│       └── codacy.instructions.md
+│
+├── .vscode/
+│   └── settings.json
 │
 ├── app/
-│   ├── main.py            # Lógica principal da API (health, launch, score, auth, SQLite)
+│   ├── __pycache__/
 │   ├── __init__.py
+│   ├── computerak.db                     # Banco SQLite (gerado automaticamente na Fase 3)
+│   └── main.py                           # Lógica principal da API (health, launch, score, auth, SQLite)
 │
-├── computerrak.db         # Banco SQLite (gerado automaticamente na Fase 3)
-├── requirements.txt
+├── venv/
+│   ├── etc/
+│   ├── Include/
+│   ├── Lib/
+│   ├── Scripts/
+│   ├── share/
+│   └── pyvenv.cfg
+│
 ├── .gitignore
-└── README.md
+├── bd.json
+├── computerak.db
+├── EXAM_BANK.json
+├── FACT_BANK.json
+├── index.html
+├── LICENSE
+├── QUIZ_BANK.json
+├── README.md
+├── Relatorio_ComputerRak.md
+└── Relatorio-Pedagogico-ComputerRak.md
 ```
 
 ---
 
-# ▶️ Como Rodar o Projeto Localmente
+# Como Rodar o Projeto Localmente
 
 ## 1) Clonar o repositório
 
@@ -126,159 +151,7 @@ API disponível em:
 
 ---
 
-# 🔐 Autenticação (Fase 4)
-
-A partir da fase de consolidação, as rotas de jogo usam um header fixo:
-
-```text
-x-api-key: computerrak-dev
-```
-
-Sem o token → **401 Unauthorized**
-
-> A rota `/health` é pública para facilitar testes rápidos.
-
----
-
-# 🌐 Endpoints Implementados
-
-## 🩺 GET `/health`
-
-Verifica se o serviço está no ar.
-
-Exemplo de resposta:
-
-```json
-{ "status": "ok", "service": "computerrak-api" }
-```
-
----
-
-## 🎮 POST `/launch`
-
-Inicia uma nova sessão (partida) e registra no SQLite.
-
-### Exemplo de request:
-
-```json
-{ "user": "ana" }
-```
-
-### Exemplo de response:
-
-```json
-{
-  "session_id": "uuid",
-  "position": 0,
-  "score": 0,
-  "message": "partida iniciada"
-}
-```
-
----
-
-## 🧠 POST `/score`
-
-Registra uma resposta do jogador, calcula pontos e atualiza o score da sessão.
-
-### Exemplo de request:
-
-```json
-{
-  "session_id": "uuid",
-  "payload_id": "q_001",
-  "answer": 1
-}
-```
-
-### Exemplo de response:
-
-```json
-{
-  "delta": 10,
-  "score": 10,
-  "explanation": "Mestre: a=b=2, f(n)=n ⇒ caso 2 ⇒ O(n log n).",
-  "correct": true
-}
-```
-
-> Na Fase 3, esse fluxo foi demonstrado em vídeo, incluindo consulta ao banco (`sessions` e `attempts`) e mapa mental da execução ponta a ponta.
-
----
-
-# 🗄️ Banco de Dados (Fase 3)
-
-O **modelo relacional** simplificado é:
-
-## Tabela `sessions`
-- `id_sessao` (PK)  
-- `user`  
-- `position`  
-- `score`  
-- `created_at`  
-
-## Tabela `attempts`
-- `id_attempt` (PK)  
-- `id_sessao` (FK → sessions.id_sessao)  
-- `payload_id`  
-- `answer`  
-- `delta`  
-- `created_at`  
-
-Na Fase 3 foram:
-
-- Definidas as entidades e relacionamentos.  
-- Implementadas as `CREATE TABLE` em SQLite.  
-- Gravadas sessões e tentativas durante o fluxo `/launch` → `/score`.  
-- Registrados evidências (vídeo + mapa mental) mostrando a consulta ao banco.
-
----
-
-# 🧪 Testes Funcionais (Fase 4)
-
-Principais cenários executados e validados:
-
-| Cenário | Resultado esperado | Status |
-|--------|--------------------|--------|
-| `/health` sem token | 200 OK | ✅ |
-| `/launch` com token válido | 200 + sessão criada em `sessions` | ✅ |
-| `/launch` sem token | 401 Unauthorized | ✅ |
-| `/score` com `session_id` válido e resposta correta | 200 + score atualizado + registro em `attempts` | ✅ |
-| `/score` com `session_id` inválido | 400 Bad Request (`session_id inválido`) | ✅ |
-| `/score` sem token | 401 Unauthorized | ✅ |
-
-Esses testes garantem a consistência entre os objetivos do jogo e a implementação técnica.
-
----
-
-# 🧪 Exemplos via curl
-
-## Criar partida (Fase 2+)
-
-```bash
-curl -X POST "http://127.0.0.1:8000/launch" -H "x-api-key: computerrak-dev" -H "Content-Type: application/json" -d "{\"user\":\"ana\"}"
-```
-
-## Registrar resposta (Fase 2+)
-
-```bash
-curl -X POST "http://127.0.0.1:8000/score" -H "x-api-key: computerrak-dev" -H "Content-Type: application/json" -d "{\"session_id\":\"ID\",\"payload_id\":\"q_001\",\"answer\":1}"
-```
-
----
-
-# 📌 Convenção de Branches
-
-- `main` → versão estável  
-- `dev` → integração contínua  
-- `feat/<nome>` → novas funcionalidades  
-- `docs/<descricao>` → alterações na documentação  
-
-Commits seguem a ideia de **Conventional Commits** (ex.: `feat: adiciona rota /score`).
-
----
-
-# 🛣️ Roadmap — Fases do Projeto
+# Roadmap — Fases do Projeto
 
 ### **Fase 1 — Repositório e Healthcheck**
 - Estrutura base do projeto  
@@ -306,14 +179,17 @@ Commits seguem a ideia de **Conventional Commits** (ex.: `feat: adiciona rota /s
 - Detalhar instalação, dependências, token, rotas e exemplos de uso  
 - Preparar o projeto para ser executado por qualquer usuário sem conhecimento prévio do código
 
-### **Fase 6 — Próximos Passos (fora do escopo obrigatório, mas planejados)**
+### **Fase 6  — Implementação da Interface
+- Frontend em **HTML** com tabuleiro visual
+  
+### **Fase 7 — Próximos Passos (fora do escopo obrigatório, mas planejados)**
 - Frontend em **Streamlit** com tabuleiro visual  
 - Empacotamento em **Docker**  
 - Ajustes finais, testes adicionais e apresentação estendida
 
 ---
 
-# 🛠️ Debug / Problemas Comuns
+#  Debug / Problemas Comuns
 
 | Problema | Possível causa | Solução |
 |---------|----------------|---------|
@@ -324,7 +200,7 @@ Commits seguem a ideia de **Conventional Commits** (ex.: `feat: adiciona rota /s
 
 ---
 
-# 👥 Integrantes
+#  Integrantes
 
 - **Ana Luiza Guilherme** — 33911410 — analuizaguilher0@gmail.com  
 - **Kayky Mourão de Oliveira** — 33579016 — kaykyoliveiramourao2004@gmail.com  
