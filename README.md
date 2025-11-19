@@ -3,7 +3,7 @@
 > Plataforma gamificada para apoiar o estudo de **Computabilidade** e **Complexidade de Algoritmos**, utilizando um **tabuleiro digital**, quizzes e provas guiadas.  
 > Backend em **FastAPI**, Banco **SQLite**, Frontend em **Streamlit** (planejado) e empacotamento final em **Docker** (planejado).
 
-**Status do Projeto:** Até a **Fase 5** concluída no contexto da disciplina  
+**Status do Projeto:** Até a **Fase 6** concluída no contexto da disciplina  
 - **Fase 1** → Estruturação do repositório + `/health`  
 - **Fase 2** → Rotas `/launch` e `/score` com lógica básica de jogo  
 - **Fase 3** → Modelo relacional + persistência em **SQLite** + fluxo ponta a ponta (vídeo + mapa mental)  
