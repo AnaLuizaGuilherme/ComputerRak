@@ -1,0 +1,234 @@
+[
+    {
+        "id": "quiz_001",
+        "type": "mcq",
+        "topic": "Funções computáveis",
+        "question": "O que significa dizer que uma função f: ℕ → ℕ é computável?",
+        "options": [
+            "Que existe um programa que calcula f(n) para todo n em tempo polinomial.",
+            "Que existe uma máquina de Turing que calcula f(n) para todo n onde f está definida.",
+            "Que f sempre termina em no máximo n passos para entrada n."
+        ],
+        "correct_index": 1,
+        "explanation": "Função computável é aquela para a qual existe uma máquina de Turing que, dada a entrada n, produz f(n) sempre que f estiver definida para n."
+    },
+    {
+        "id": "quiz_002",
+        "type": "mcq",
+        "topic": "Máquinas de Turing",
+        "question": "Qual é a característica central de uma máquina de Turing determinística?",
+        "options": [
+            "Para cada par (estado, símbolo), há no máximo uma transição possível.",
+            "Ela sempre aceita todas as palavras de entrada.",
+            "Ela nunca entra em laço infinito."
+        ],
+        "correct_index": 0,
+        "explanation": "Determinística significa que a função de transição é funcional: para cada combinação (estado, símbolo) existe no máximo uma ação definida."
+    },
+    {
+        "id": "quiz_003",
+        "type": "tf",
+        "topic": "Linguagens Recursivas",
+        "question": "Toda linguagem recursiva é também recursivamente enumerável (RE).",
+        "options": ["Verdadeiro", "Falso"],
+        "correct_index": 0,
+        "explanation": "Toda linguagem decidível (recursiva) é, em particular, RE, pois podemos enumerar suas cadeias aceitas executando o decidor em todas as entradas."
+    },
+    {
+        "id": "quiz_004",
+        "type": "tf",
+        "topic": "Linguagens RE",
+        "question": "Toda linguagem recursivamente enumerável é decidível.",
+        "options": ["Verdadeiro", "Falso"],
+        "correct_index": 1,
+        "explanation": "Existem linguagens RE mas não decidíveis, como a linguagem do Problema da Parada. A MT reconhece, mas não decide em todos os casos."
+    },
+    {
+        "id": "quiz_005",
+        "type": "mcq",
+        "topic": "Problema da Parada",
+        "question": "Por que o Problema da Parada é considerado indecidível?",
+        "options": [
+            "Porque nenhuma máquina de Turing consegue simular outra máquina.",
+            "Porque não existe algoritmo que, para toda entrada, decida se um programa p para na entrada x.",
+            "Porque sempre existe um algoritmo aproximado que resolve o problema."
+        ],
+        "correct_index": 1,
+        "explanation": "A prova clássica por diagonalização mostra que não existe algoritmo geral que decida, para todo (p,x), se p pára em x."
+    },
+    {
+        "id": "quiz_006",
+        "type": "mcq",
+        "topic": "Reduções",
+        "question": "Em uma redução de linguagem A para B (A ≤m B), o que significa dizer que A é redutível a B?",
+        "options": [
+            "Que qualquer algoritmo para B pode ser convertido em algoritmo para A por uma função computável.",
+            "Que A e B são sempre iguais.",
+            "Que B é necessariamente mais simples que A."
+        ],
+        "correct_index": 0,
+        "explanation": "A ≤m B quer dizer que existe uma função computável f tal que x ∈ A se, e somente se, f(x) ∈ B. Assim, um decidor para B implica um decidor para A."
+    },
+    {
+        "id": "quiz_007",
+        "type": "tf",
+        "topic": "Teorema de Rice",
+        "question": "O Teorema de Rice afirma que qualquer propriedade semântica não trivial de programas é indecidível.",
+        "options": ["Verdadeiro", "Falso"],
+        "correct_index": 0,
+        "explanation": "Rice mostra que propriedades sobre o comportamento das funções computadas por programas (e não sobre sua sintaxe) são indecidíveis, se forem não triviais."
+    },
+    {
+        "id": "quiz_008",
+        "type": "mcq",
+        "topic": "Reconhecimento",
+        "question": "Qual é a característica de uma linguagem RE (recursivamente enumerável)?",
+        "options": [
+            "Existe uma MT que aceita todas as cadeias em tempo polinomial.",
+            "Existe uma MT que aceita as cadeias da linguagem e pode não parar para cadeias fora da linguagem.",
+            "Existe uma MT que rejeita rapidamente todas as cadeias fora da linguagem."
+        ],
+        "correct_index": 1,
+        "explanation": "Linguagens RE são reconhecidas: a máquina aceita quando a palavra está na linguagem, mas pode loopar para palavras fora dela."
+    },
+    {
+        "id": "quiz_009",
+        "type": "mcq",
+        "topic": "co-RE",
+        "question": "Uma linguagem L é co-RE quando:",
+        "options": [
+            "Seu complemento é RE.",
+            "Ela é ao mesmo tempo RE e recursiva.",
+            "Ela é finita."
+        ],
+        "correct_index": 0,
+        "explanation": "Definição: L é co-RE se o complemento de L é recursivamente enumerável."
+    },
+    {
+        "id": "quiz_010",
+        "type": "tf",
+        "topic": "Classe RE ∩ co-RE",
+        "question": "Se uma linguagem é RE e co-RE, então ela é decidível.",
+        "options": ["Verdadeiro", "Falso"],
+        "correct_index": 0,
+        "explanation": "Se tanto L quanto seu complemento são RE, podemos rodar as duas MTs em paralelo. Uma delas deve aceitar, decidindo assim L."
+    },
+    {
+        "id": "quiz_011",
+        "type": "mcq",
+        "topic": "Máquinas de Turing",
+        "question": "Qual das alternativas NÃO é uma variação equivalente de máquina de Turing padrão?",
+        "options": [
+            "Máquina de Turing com múltiplas fitas.",
+            "Máquina de Turing probabilística com oráculo para problemas não computáveis.",
+            "Máquina de Turing com alfabeto maior que {0,1}."
+        ],
+        "correct_index": 1,
+        "explanation": "Máquinas com múltiplas fitas ou alfabetos maiores são equivalentes em poder computacional; já uma MT com oráculo pode ir além da computabilidade clássica."
+    },
+    {
+        "id": "quiz_012",
+        "type": "mcq",
+        "topic": "Problema da equivalência",
+        "question": "O problema de decidir se dois programas sempre produzem a mesma saída para todas as entradas é:",
+        "options": [
+            "Decidível.",
+            "Indecidível, por consequência de resultados como Rice.",
+            "Decidível apenas para programas em linguagens funcionais."
+        ],
+        "correct_index": 1,
+        "explanation": "Equivalência de programas é um exemplo clássico de propriedade semântica não trivial, logo indecidível pelo Teorema de Rice."
+    },
+    {
+        "id": "quiz_013",
+        "type": "tf",
+        "topic": "Linguagens Regulares x Computabilidade",
+        "question": "Toda linguagem regular é decidível por uma máquina de Turing.",
+        "options": ["Verdadeiro", "Falso"],
+        "correct_index": 0,
+        "explanation": "AFNs e AFs determinísticos podem ser simulados por uma MT, logo linguagens regulares são decidíveis."
+    },
+    {
+        "id": "quiz_014",
+        "type": "mcq",
+        "topic": "Post Correspondence Problem (PCP)",
+        "question": "O PCP (Problema da Correspondência de Post) é:",
+        "options": [
+            "Um problema decidível usado para testar autômatos.",
+            "Um problema indecidível usado como base para reduções.",
+            "Um problema de otimização em grafos."
+        ],
+        "correct_index": 1,
+        "explanation": "PCP é indecidível e frequentemente usado como problema-fonte em provas de indecidibilidade via redução."
+    },
+    {
+        "id": "quiz_015",
+        "type": "mcq",
+        "topic": "Diagonalização",
+        "question": "A técnica de diagonalização foi usada originalmente para:",
+        "options": [
+            "Provar a indecidibilidade do Problema da Parada.",
+            "Mostrar que o conjunto dos números reais é não enumerável.",
+            "Caracterizar linguagens regulares."
+        ],
+        "correct_index": 1,
+        "explanation": "Cantor usou diagonalização para provar que ℝ é não enumerável; a ideia foi adaptada em computabilidade."
+    },
+    {
+        "id": "quiz_016",
+        "type": "tf",
+        "topic": "Funções parciais",
+        "question": "Funções computáveis podem ser parciais, isto é, não definidas para toda entrada.",
+        "options": ["Verdadeiro", "Falso"],
+        "correct_index": 0,
+        "explanation": "Muitas funções computáveis são modeladas como parciais, pois o programa pode não parar para certas entradas."
+    },
+    {
+        "id": "quiz_017",
+        "type": "mcq",
+        "topic": "Complexidade vs Computabilidade",
+        "question": "O que diferencia complexidade de computabilidade?",
+        "options": [
+            "Computabilidade pergunta 'o que é possível computar'; complexidade pergunta 'com que custo'.",
+            "Complexidade foca apenas em memória; computabilidade, apenas em tempo.",
+            "São exatamente a mesma área, com nomes diferentes."
+        ],
+        "correct_index": 0,
+        "explanation": "Computabilidade se preocupa com a existência de algoritmos; complexidade estuda recursos necessários (tempo, espaço, etc.)."
+    },
+    {
+        "id": "quiz_018",
+        "type": "mcq",
+        "topic": "Funções de parada",
+        "question": "Por que não existe uma função computável total que diga se qualquer programa p pára na entrada x?",
+        "options": [
+            "Porque não sabemos descrever programas formalmente.",
+            "Porque a prova do Problema da Parada mostra contradição ao assumir tal função.",
+            "Porque programas podem ser muito grandes."
+        ],
+        "correct_index": 1,
+        "explanation": "Supondo tal função total, podemos construir um programa que gera comportamento contraditório, provando que essa função não pode ser computável."
+    },
+    {
+        "id": "quiz_019",
+        "type": "tf",
+        "topic": "Enumerabilidade",
+        "question": "O conjunto de todos os programas possíveis é enumerável.",
+        "options": ["Verdadeiro", "Falso"],
+        "correct_index": 0,
+        "explanation": "Programas podem ser codificados como cadeias finitas sobre um alfabeto finito, e cadeias finitas formam um conjunto enumerável."
+    },
+    {
+        "id": "quiz_020",
+        "type": "mcq",
+        "topic": "Linguagens não RE",
+        "question": "Uma linguagem que não é RE:",
+        "options": [
+            "Não pode ser reconhecida nem parcialmente por nenhuma MT.",
+            "É sempre finita.",
+            "Pode ser decidida por MT não determinística."
+        ],
+        "correct_index": 0,
+        "explanation": "Linguagens não RE não são reconhecíveis: não existe MT que aceite exatamente suas cadeias, nem mesmo permitindo laços para fora da linguagem."
+    }
+]

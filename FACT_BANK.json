@@ -1,0 +1,202 @@
+ [
+    {
+        "id": "fact_001",
+        "kind": "verdade",
+        "text": "Nem todo problema computacional tem solução algorítmica: alguns são indecidíveis, como o Problema da Parada."
+    },
+    {
+        "id": "fact_002",
+        "kind": "dica",
+        "text": "Sempre que você vê uma prova de indecidibilidade, procure identificar qual problema conhecido está sendo reduzido para o novo problema."
+    },
+    {
+        "id": "fact_003",
+        "kind": "curiosidade",
+        "text": "A ideia de máquinas de Turing foi proposta por Alan Turing em 1936 para formalizar o conceito de 'método efetivo'."
+    },
+    {
+        "id": "fact_004",
+        "kind": "verdade",
+        "text": "Linguagens recursivas são aquelas para as quais existe um algoritmo que sempre termina respondendo sim ou não."
+    },
+    {
+        "id": "fact_005",
+        "kind": "verdade",
+        "text": "Toda linguagem recursiva é recursivamente enumerável, mas o contrário não é verdadeiro."
+    },
+    {
+        "id": "fact_006",
+        "kind": "curiosidade",
+        "text": "O teorema de Rice mostra que é 'perigoso' tentar decidir propriedades interessantes sobre o comportamento de programas em geral."
+    },
+    {
+        "id": "fact_007",
+        "kind": "dica",
+        "text": "Ao estudar reduções, desenhe um diagrama mental: 'se eu tivesse um decidor para B, como eu resolveria A?'."
+    },
+    {
+        "id": "fact_008",
+        "kind": "verdade",
+        "text": "A diagonalização é uma técnica usada tanto em teoria dos conjuntos quanto em computabilidade para mostrar que certas coleções são grandes demais para serem enumeradas."
+    },
+    {
+        "id": "fact_009",
+        "kind": "curiosidade",
+        "text": "O conjunto de todos os programas é enumerável, mas o conjunto de todas as funções possíveis de ℕ em ℕ não é. Isso gera uma diferença entre funções e programas."
+    },
+    {
+        "id": "fact_010",
+        "kind": "dica",
+        "text": "Quando estiver em dúvida se uma linguagem é decidível, pergunte: 'conheço algum algoritmo que sempre termina para todas as entradas?'."
+    },
+    {
+        "id": "fact_011",
+        "kind": "verdade",
+        "text": "Linguagens não RE estão 'além' até mesmo da capacidade de reconhecimento: não há máquina que aceite exatamente suas cadeias."
+    },
+    {
+        "id": "fact_012",
+        "kind": "curiosidade",
+        "text": "A máquina universal de Turing, proposta por Turing, já é um antepassado conceitual da ideia de computador programável."
+    },
+    {
+        "id": "fact_013",
+        "kind": "dica",
+        "text": "Em provas de indecidibilidade, quase sempre você verá uma combinação de codificação de programas, auto-referência e redução."
+    },
+    {
+        "id": "fact_014",
+        "kind": "verdade",
+        "text": "Se uma linguagem é RE e seu complemento também é RE, então ela é decidível (recursiva)."
+    },
+    {
+        "id": "fact_015",
+        "kind": "curiosidade",
+        "text": "A fronteira entre o que é decidível e indecidível não depende de hardware ou de linguagem de programação: é uma limitação teórica."
+    },
+    {
+        "id": "fact_016",
+        "kind": "dica",
+        "text": "Para entender Rice, treine separar 'propriedade do código' (sintaxe) de 'propriedade do comportamento' (semântica)."
+    },
+    {
+        "id": "fact_017",
+        "kind": "verdade",
+        "text": "Qualquer problema indecidível continua indecidível mesmo em linguagens modernas e poderosas: aumentar recursos não quebra essa barreira."
+    },
+    {
+        "id": "fact_018",
+        "kind": "curiosidade",
+        "text": "Muitas análises estáticas de código, em compiladores, adotam aproximações justamente porque problemas semânticos gerais são indecidíveis."
+    },
+    {
+        "id": "fact_019",
+        "kind": "dica",
+        "text": "Lembre-se: RE significa 'há um algoritmo que aceita exatamente as palavras da linguagem, mas não necessariamente rejeita as demais'."
+    },
+    {
+        "id": "fact_020",
+        "kind": "verdade",
+        "text": "Existem problemas que são indecidíveis mesmo restringindo-se a linguagens bem simples de programação."
+    },
+    {
+        "id": "fact_021",
+        "kind": "curiosidade",
+        "text": "O PCP foi criado por Emil Post e se tornou um dos problemas-padrão para provas de indecidibilidade."
+    },
+    {
+        "id": "fact_022",
+        "kind": "dica",
+        "text": "Ao ver uma linguagem definida de forma 'auto-referente' (como 'programas que não param em si mesmos'), desconfie: provavelmente é exemplo de indecidibilidade."
+    },
+    {
+        "id": "fact_023",
+        "kind": "verdade",
+        "text": "Muitas linguagens de especificação evitam Turing-completude propositalmente para manter certas propriedades decidíveis."
+    },
+    {
+        "id": "fact_024",
+        "kind": "curiosidade",
+        "text": "O estudo de computabilidade influenciou fortemente áreas como verificação de software, lógica e teoria da prova."
+    },
+    {
+        "id": "fact_025",
+        "kind": "dica",
+        "text": "Se você consegue reduzir um problema já conhecido como indecidível para o seu, você tem um caminho forte para provar indecidibilidade."
+    },
+    {
+        "id": "fact_026",
+        "kind": "verdade",
+        "text": "Computabilidade não se preocupa com 'tempo prático', apenas com a existência de um procedimento finito."
+    },
+    {
+        "id": "fact_027",
+        "kind": "curiosidade",
+        "text": "Conceitos de computabilidade apareceram quase ao mesmo tempo com Church, Turing, Kleene e outros, em diferentes formalismos equivalentes."
+    },
+    {
+        "id": "fact_028",
+        "kind": "dica",
+        "text": "Sempre leia com atenção as definições formais: uma pequena mudança (como 'sempre para' vs 'pode não parar') muda completamente a classe de linguagem."
+    },
+    {
+        "id": "fact_029",
+        "kind": "verdade",
+        "text": "Se uma linguagem é decidível, então também é fechada sob complemento: basta inverter a decisão do algoritmo."
+    },
+    {
+        "id": "fact_030",
+        "kind": "curiosidade",
+        "text": "Existem hierarquias inteiras de problemas não computáveis, como a hierarquia aritmética e analítica."
+    },
+    {
+        "id": "fact_031",
+        "kind": "dica",
+        "text": "Quando estiver confuso entre RE, co-RE e recursiva, desenhe diagramas de conjuntos para visualizar as inclusões."
+    },
+    {
+        "id": "fact_032",
+        "kind": "verdade",
+        "text": "Embora o Problema da Parada seja indecidível no geral, versões restritas podem ser decidíveis."
+    },
+    {
+        "id": "fact_033",
+        "kind": "curiosidade",
+        "text": "A diagonalização inspirou não apenas provas em matemática, mas também argumentos filosóficos sobre limites de conhecimento."
+    },
+    {
+        "id": "fact_034",
+        "kind": "dica",
+        "text": "Em exercícios de máquina de Turing, tente sempre pensar em termos de 'configurações' (estado + fita + posição de cabeça)."
+    },
+    {
+        "id": "fact_035",
+        "kind": "verdade",
+        "text": "Mesmo problemas práticos, como análise geral de vulnerabilidades de segurança, têm aspectos indecidíveis."
+    },
+    {
+        "id": "fact_036",
+        "kind": "curiosidade",
+        "text": "Muitos problemas de verificação de hardware usam fragmentos lógicos cuidadosamente escolhidos para garantir decidibilidade."
+    },
+    {
+        "id": "fact_037",
+        "kind": "dica",
+        "text": "Pratique converter problemas em linguagens formais: isso ajuda a enxergar se o problema tende a ser decidível ou não."
+    },
+    {
+        "id": "fact_038",
+        "kind": "verdade",
+        "text": "Computabilidade é uma base teórica para entender por que nem tudo pode ser automatizado, mesmo em um mundo cheio de computadores."
+    },
+    {
+        "id": "fact_039",
+        "kind": "curiosidade",
+        "text": "A noção de 'algoritmo' usada antes da computabilidade era apenas intuitiva; Turing e outros deram a primeira formalização rigorosa."
+    },
+    {
+        "id": "fact_040",
+        "kind": "dica",
+        "text": "Leia as provas devagar: em computabilidade, entender meia dúzia de provas profundas vale mais que decorar dezenas de definições."
+    }
+]

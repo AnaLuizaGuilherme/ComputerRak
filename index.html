@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>ComputerRak - Tabuleiro (Com Regras)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary-color: #4361ee;
+      --primary-hover: #3a56d4;
+      --secondary-color: #eef2f5;
+      --accent-color: #f72585;
+      --text-main: #2b2d42;
+      --text-muted: #8d99ae;
+      --bg-body: #f8f9fa;
+      --bg-board: #ffffff;
+      --cell-bg: #f0f4f8;
+      --cell-border: #dbe9f6;
+      
+      /* Cores Especiais das Regras */
+      --quiz-color: #7209b7; /* Roxo para Perguntas */
+      --quiz-bg: #f2e6ff;
+      --tip-color: #f7b801;  /* Amarelo/Laranja para Dicas */
+      --tip-bg: #fffce6;
+
+      --shadow-soft: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #e0e7ff 0%, #f8f9fa 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      color: var(--text-main);
+    }
+
+    .game-wrapper {
+      width: 100%;
+      max-width: 1024px;
+      padding: 24px;
+    }
+
+    .game-title {
+      text-align: center;
+      margin-bottom: 32px;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      letter-spacing: -0.5px;
+    }
+
+    .game-container {
+      display: flex;
+      gap: 40px;
+      align-items: flex-start;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* --- Tabuleiro --- */
+    .board-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .board-label {
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-size: 0.85rem;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(5, 1fr);
+      width: min(480px, 90vw);
+      aspect-ratio: 1 / 1;
+      background: var(--bg-board);
+      border-radius: 24px;
+      padding: 16px;
+      gap: 8px; 
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      border: 1px solid rgba(255,255,255,0.5);
+    }
+
+    .cell {
+      position: relative;
+      background: var(--cell-bg);
+      border-radius: 12px;
+      border: 2px solid transparent;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-end;
+      padding: 6px;
+      transition: all 0.3s ease;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+    }
+
+    /* Estilos para casas especiais (Regras) */
+    .cell.cell-quiz {
+      background-color: var(--quiz-bg);
+      border-color: #e0c3fc;
+      color: var(--quiz-color);
+    }
+    .cell.cell-quiz::after {
+      content: "?";
+      position: absolute;
+      bottom: 4px;
+      left: 6px;
+      font-size: 1.2rem;
+      opacity: 0.3;
+    }
+
+    .cell.cell-tip {
+      background-color: var(--tip-bg);
+      border-color: #ffec99;
+      color: #d48806;
+    }
+    .cell.cell-tip::after {
+      content: "💡";
+      position: absolute;
+      bottom: 4px;
+      left: 6px;
+      font-size: 1rem;
+      opacity: 0.6;
+    }
+
+    .cell:hover {
+      transform: translateY(-2px);
+      filter: brightness(0.98);
+    }
+
+    .cell-index { opacity: 0.5; }
+    .hole { background: transparent; border: none; box-shadow: none; pointer-events: none; }
+
+    /* Grid Logic */
+    .cell-0  { grid-row: 5; grid-column: 1; border-bottom-left-radius: 20px; }
+    .cell-1  { grid-row: 4; grid-column: 1; }
+    .cell-2  { grid-row: 3; grid-column: 1; }
+    .cell-3  { grid-row: 2; grid-column: 1; }
+    .cell-4  { grid-row: 1; grid-column: 1; border-top-left-radius: 20px; }
+    .cell-5  { grid-row: 1; grid-column: 2; }
+    .cell-6  { grid-row: 1; grid-column: 3; }
+    .cell-7  { grid-row: 1; grid-column: 4; }
+    .cell-8  { grid-row: 1; grid-column: 5; border-top-right-radius: 20px; }
+    .cell-9  { grid-row: 2; grid-column: 5; }
+    .cell-10 { grid-row: 3; grid-column: 5; }
+    .cell-11 { grid-row: 4; grid-column: 5; }
+    .cell-12 { grid-row: 5; grid-column: 5; border-bottom-right-radius: 20px; }
+    .cell-13 { grid-row: 5; grid-column: 4; }
+    .cell-14 { grid-row: 5; grid-column: 3; }
+    .cell-15 { grid-row: 5; grid-column: 2; }
+
+    .hole-1 { grid-row: 2; grid-column: 2; }
+    .hole-2 { grid-row: 2; grid-column: 3; }
+    .hole-3 { grid-row: 2; grid-column: 4; }
+    .hole-4 { grid-row: 3; grid-column: 2; }
+    .hole-5 { grid-row: 3; grid-column: 3; }
+    .hole-6 { grid-row: 3; grid-column: 4; }
+    .hole-7 { grid-row: 4; grid-column: 2; }
+    .hole-8 { grid-row: 4; grid-column: 3; }
+    .hole-9 { grid-row: 4; grid-column: 4; }
+
+    /* --- A Peça --- */
+    .piece {
+      position: absolute;
+      width: 65%;
+      height: 65%;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      color: var(--accent-color); 
+      filter: drop-shadow(0 4px 6px rgba(247, 37, 133, 0.4));
+      transition: transform 0.3s ease;
+    }
+
+    .piece::before,
+    .piece::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(180deg, #ff99c8 0%, #f72585 100%);
+    }
+
+    .piece::before { width: 40%; height: 40%; border-radius: 50%; top: 0; }
+    .piece::after { width: 80%; height: 70%; bottom: 0; border-radius: 50% 50% 15% 15%; }
+
+    @keyframes hop {
+      0%   { transform: translate(-50%, -50%) scale(1); }
+      50%  { transform: translate(-50%, -80%) scale(1.2); }
+      100% { transform: translate(-50%, -50%) scale(1); }
+    }
+    .piece.hop { animation: hop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+    /* --- Sidebar --- */
+    .sidebar {
+      flex: 1;
+      min-width: 300px;
+      max-width: 350px;
+      background: #fff;
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .sidebar h2 { font-size: 1.4rem; color: var(--text-main); border-bottom: 2px solid var(--cell-bg); padding-bottom: 12px; }
+    .sidebar p { font-size: 0.95rem; line-height: 1.5; color: #555; }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 24px;
+      font-size: 1rem;
+      cursor: pointer;
+      background: var(--primary-color);
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+      transition: all 0.2s ease;
+      width: 100%;
+    }
+    .button:hover { transform: translateY(-2px); background: var(--primary-hover); box-shadow: 0 6px 16px rgba(67, 97, 238, 0.4); }
+    .button:active { transform: translateY(0); }
+    .button.secondary { background: white; color: var(--primary-color); border: 2px solid var(--cell-bg); box-shadow: none; }
+    .button.secondary:hover { background: var(--cell-bg); border-color: var(--primary-color); }
+
+    .dice-info {
+      background: var(--cell-bg);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      border: 1px dashed var(--cell-border);
+    }
+    .dice-info-title { font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; margin-bottom: 8px; }
+    #dice-last { font-weight: 700; color: var(--text-main); font-size: 1.1rem; }
+
+    /* --- Legenda --- */
+    .legend-container {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: #555; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+    .dot-quiz { background: var(--quiz-color); }
+    .dot-tip { background: var(--tip-color); }
+
+    /* --- Modais --- */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 1;
+      transition: opacity 0.2s ease;
+    }
+    .hidden { display: none !important; }
+    .modal {
+      background: #fff;
+      padding: 32px;
+      border-radius: 24px;
+      width: 90%;
+      max-width: 420px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+      animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      text-align: center;
+    }
+    @keyframes modalPop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    
+    .modal h2 { font-size: 1.5rem; margin-bottom: 12px; color: var(--text-main); }
+    .modal p { color: #555; margin-bottom: 24px; line-height: 1.6; }
+    .modal-footer { display: flex; gap: 12px; justify-content: center; margin-top: 24px; }
+    .modal-footer .button { width: auto; padding: 12px 20px; }
+
+    /* Estilo do Modal de Dica */
+    .modal.tip-modal { border-top: 8px solid var(--tip-color); }
+    .modal.quiz-modal { border-top: 8px solid var(--quiz-color); }
+
+    /* --- Opções de Resposta --- */
+    .options { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+    .option {
+      background: #fff;
+      border: 2px solid var(--cell-bg);
+      border-radius: 12px;
+      padding: 14px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+    .option:hover { border-color: #b3c7ff; background: #f8faff; }
+    .option.selected { border-color: var(--primary-color); background: #eef2ff; color: var(--primary-color); font-weight: 600; }
+    .question-feedback { margin-top: 16px; font-weight: 600; min-height: 1.2em; }
+    .question-feedback.ok { color: #10b981; }
+    .question-feedback.error { color: #ef476f; }
+
+    @media (max-width: 800px) {
+      .game-container { flex-direction: column; align-items: center; }
+      .sidebar { width: 100%; max-width: none; }
+      .board { width: 90vw; }
+    }
+  </style>
+</head>
+<body>
+  <div class="game-wrapper">
+    <h1 class="game-title">ComputerRak <span style="font-weight:300; opacity:0.7;">| Tabuleiro</span></h1>
+
+    <div class="game-container">
+      <section class="board-container">
+        <span class="board-label">Tabuleiro em anel (16 casas)</span>
+        <div class="board" id="board">
+          <div class="cell cell-0"  data-index="0"><span class="cell-index">0</span></div>
+          <div class="cell cell-1"  data-index="1"><span class="cell-index">1</span></div>
+          <div class="cell cell-2"  data-index="2"><span class="cell-index">2</span></div>
+          <div class="cell cell-3"  data-index="3"><span class="cell-index">3</span></div>
+          <div class="cell cell-4"  data-index="4"><span class="cell-index">4</span></div>
+          <div class="cell cell-5"  data-index="5"><span class="cell-index">5</span></div>
+          <div class="cell cell-6"  data-index="6"><span class="cell-index">6</span></div>
+          <div class="cell cell-7"  data-index="7"><span class="cell-index">7</span></div>
+          <div class="cell cell-8"  data-index="8"><span class="cell-index">8</span></div>
+          <div class="cell cell-9"  data-index="9"><span class="cell-index">9</span></div>
+          <div class="cell cell-10" data-index="10"><span class="cell-index">10</span></div>
+          <div class="cell cell-11" data-index="11"><span class="cell-index">11</span></div>
+          <div class="cell cell-12" data-index="12"><span class="cell-index">12</span></div>
+          <div class="cell cell-13" data-index="13"><span class="cell-index">13</span></div>
+          <div class="cell cell-14" data-index="14"><span class="cell-index">14</span></div>
+          <div class="cell cell-15" data-index="15"><span class="cell-index">15</span></div>
+
+          <div class="hole hole-1"></div>
+          <div class="hole hole-2"></div>
+          <div class="hole hole-3"></div>
+          <div class="hole hole-4"></div>
+          <div class="hole hole-5"></div>
+          <div class="hole hole-6"></div>
+          <div class="hole hole-7"></div>
+          <div class="hole hole-8"></div>
+          <div class="hole hole-9"></div>
+        </div>
+      </section>
+
+      <aside class="sidebar">
+        <h2>Painel de Controle</h2>
+        <p>O objetivo é chegar ao final aprendendo sobre computação. Cuidado com os desafios!</p>
+        
+        <div class="legend-container">
+            <div class="legend-item"><span class="legend-dot dot-quiz"></span> Quiz</div>
+            <div class="legend-item"><span class="legend-dot dot-tip"></span> Dicas</div>
+        </div>
+
+        <br>
+
+        <button class="button" id="btn-roll">Rolar dados 🎲</button>
+
+        <div class="dice-info">
+          <div class="dice-info-title">Última rolagem</div>
+          <div id="dice-last">Inicie o jogo...</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="dice-modal">
+    <div class="modal">
+      <h2>Resultado 🎲</h2>
+      <p id="dice-text" style="font-size: 1.2rem; font-weight: 600; color: var(--primary-color);">Dado 1: 0 • Dado 2: 0 <br> Soma: 0</p>
+      <p style="font-size: 0.9rem; color:#666;">
+        O peão irá avançar o número de casas correspondente à soma dos dados.
+      </p>
+      <div class="modal-footer">
+        <button class="button secondary" id="dice-close">Fechar</button>
+        <button class="button" id="dice-confirm">Mover peão</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="question-modal">
+    <div class="modal quiz-modal">
+      <h2 style="color: var(--quiz-color)">Desafio Quiz!</h2>
+      <p id="question-text" style="font-weight: 500; font-size: 1.1rem;">Carregando...</p>
+
+      <div class="options" id="question-options">
+        </div>
+
+      <p id="question-feedback" class="question-feedback"></p>
+
+      <div class="modal-footer">
+        <button class="button" id="question-confirm">Confirmar Resposta</button>
+        <button class="button secondary hidden" id="question-close">Continuar Jogo</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="tip-modal">
+    <div class="modal tip-modal">
+      <h2 style="color: #d48806">💡 Curiosidade Tech</h2>
+      <p id="tip-text" style="font-size: 1.05rem; color: #444;">
+        O primeiro bug de computador foi causado por uma mariposa real presa nos relés de uma máquina em 1947.
+      </p>
+      <div class="modal-footer">
+        <button class="button" id="tip-close">Entendido!</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* --- CONFIGURAÇÃO DO JOGO --- */
+    const TOTAL_CASAS = 16;
+    
+    // Regras baseadas na imagem
+    const REGRAS = {
+        2:  'quiz',
+        6:  'quiz',
+        10: 'quiz',
+        14: 'quiz',
+        3:  'dica',
+        7:  'dica',
+        11: 'dica',
+        15: 'dica'
+    };
+
+    // Banco de Dicas
+    const DICAS_DB =  [
+    {
+        "id": "fact_001",
+        "kind": "verdade",
+        "text": "Nem todo problema computacional tem solução algorítmica: alguns são indecidíveis, como o Problema da Parada."
+    },
+    {
+        "id": "fact_002",
+        "kind": "dica",
+        "text": "Sempre que você vê uma prova de indecidibilidade, procure identificar qual problema conhecido está sendo reduzido para o novo problema."
+    },
+    {
+        "id": "fact_003",
+        "kind": "curiosidade",
+        "text": "A ideia de máquinas de Turing foi proposta por Alan Turing em 1936 para formalizar o conceito de 'método efetivo'."
+    },
+    {
+        "id": "fact_004",
+        "kind": "verdade",
+        "text": "Linguagens recursivas são aquelas para as quais existe um algoritmo que sempre termina respondendo sim ou não."
+    },
+    {
+        "id": "fact_005",
+        "kind": "verdade",
+        "text": "Toda linguagem recursiva é recursivamente enumerável, mas o contrário não é verdadeiro."
+    },
+    {
+        "id": "fact_006",
+        "kind": "curiosidade",
+        "text": "O teorema de Rice mostra que é 'perigoso' tentar decidir propriedades interessantes sobre o comportamento de programas em geral."
+    },
+    {
+        "id": "fact_007",
+        "kind": "dica",
+        "text": "Ao estudar reduções, desenhe um diagrama mental: 'se eu tivesse um decidor para B, como eu resolveria A?'."
+    },
+    {
+        "id": "fact_008",
+        "kind": "verdade",
+        "text": "A diagonalização é uma técnica usada tanto em teoria dos conjuntos quanto em computabilidade para mostrar que certas coleções são grandes demais para serem enumeradas."
+    },
+    {
+        "id": "fact_009",
+        "kind": "curiosidade",
+        "text": "O conjunto de todos os programas é enumerável, mas o conjunto de todas as funções possíveis de ℕ em ℕ não é. Isso gera uma diferença entre funções e programas."
+    },
+    {
+        "id": "fact_010",
+        "kind": "dica",
+        "text": "Quando estiver em dúvida se uma linguagem é decidível, pergunte: 'conheço algum algoritmo que sempre termina para todas as entradas?'."
+    },
+    {
+        "id": "fact_011",
+        "kind": "verdade",
+        "text": "Linguagens não RE estão 'além' até mesmo da capacidade de reconhecimento: não há máquina que aceite exatamente suas cadeias."
+    },
+    {
+        "id": "fact_012",
+        "kind": "curiosidade",
+        "text": "A máquina universal de Turing, proposta por Turing, já é um antepassado conceitual da ideia de computador programável."
+    },
+    {
+        "id": "fact_013",
+        "kind": "dica",
+        "text": "Em provas de indecidibilidade, quase sempre você verá uma combinação de codificação de programas, auto-referência e redução."
+    },
+    {
+        "id": "fact_014",
+        "kind": "verdade",
+        "text": "Se uma linguagem é RE e seu complemento também é RE, então ela é decidível (recursiva)."
+    },
+    {
+        "id": "fact_015",
+        "kind": "curiosidade",
+        "text": "A fronteira entre o que é decidível e indecidível não depende de hardware ou de linguagem de programação: é uma limitação teórica."
+    },
+    {
+        "id": "fact_016",
+        "kind": "dica",
+        "text": "Para entender Rice, treine separar 'propriedade do código' (sintaxe) de 'propriedade do comportamento' (semântica)."
+    },
+    {
+        "id": "fact_017",
+        "kind": "verdade",
+        "text": "Qualquer problema indecidível continua indecidível mesmo em linguagens modernas e poderosas: aumentar recursos não quebra essa barreira."
+    },
+    {
+        "id": "fact_018",
+        "kind": "curiosidade",
+        "text": "Muitas análises estáticas de código, em compiladores, adotam aproximações justamente porque problemas semânticos gerais são indecidíveis."
+    },
+    {
+        "id": "fact_019",
+        "kind": "dica",
+        "text": "Lembre-se: RE significa 'há um algoritmo que aceita exatamente as palavras da linguagem, mas não necessariamente rejeita as demais'."
+    },
+    {
+        "id": "fact_020",
+        "kind": "verdade",
+        "text": "Existem problemas que são indecidíveis mesmo restringindo-se a linguagens bem simples de programação."
+    },
+    {
+        "id": "fact_021",
+        "kind": "curiosidade",
+        "text": "O PCP foi criado por Emil Post e se tornou um dos problemas-padrão para provas de indecidibilidade."
+    },
+    {
+        "id": "fact_022",
+        "kind": "dica",
+        "text": "Ao ver uma linguagem definida de forma 'auto-referente' (como 'programas que não param em si mesmos'), desconfie: provavelmente é exemplo de indecidibilidade."
+    },
+    {
+        "id": "fact_023",
+        "kind": "verdade",
+        "text": "Muitas linguagens de especificação evitam Turing-completude propositalmente para manter certas propriedades decidíveis."
+    },
+    {
+        "id": "fact_024",
+        "kind": "curiosidade",
+        "text": "O estudo de computabilidade influenciou fortemente áreas como verificação de software, lógica e teoria da prova."
+    },
+    {
+        "id": "fact_025",
+        "kind": "dica",
+        "text": "Se você consegue reduzir um problema já conhecido como indecidível para o seu, você tem um caminho forte para provar indecidibilidade."
+    },
+    {
+        "id": "fact_026",
+        "kind": "verdade",
+        "text": "Computabilidade não se preocupa com 'tempo prático', apenas com a existência de um procedimento finito."
+    },
+    {
+        "id": "fact_027",
+        "kind": "curiosidade",
+        "text": "Conceitos de computabilidade apareceram quase ao mesmo tempo com Church, Turing, Kleene e outros, em diferentes formalismos equivalentes."
+    },
+    {
+        "id": "fact_028",
+        "kind": "dica",
+        "text": "Sempre leia com atenção as definições formais: uma pequena mudança (como 'sempre para' vs 'pode não parar') muda completamente a classe de linguagem."
+    },
+    {
+        "id": "fact_029",
+        "kind": "verdade",
+        "text": "Se uma linguagem é decidível, então também é fechada sob complemento: basta inverter a decisão do algoritmo."
+    },
+    {
+        "id": "fact_030",
+        "kind": "curiosidade",
+        "text": "Existem hierarquias inteiras de problemas não computáveis, como a hierarquia aritmética e analítica."
+    },
+    {
+        "id": "fact_031",
+        "kind": "dica",
+        "text": "Quando estiver confuso entre RE, co-RE e recursiva, desenhe diagramas de conjuntos para visualizar as inclusões."
+    },
+    {
+        "id": "fact_032",
+        "kind": "verdade",
+        "text": "Embora o Problema da Parada seja indecidível no geral, versões restritas podem ser decidíveis."
+    },
+    {
+        "id": "fact_033",
+        "kind": "curiosidade",
+        "text": "A diagonalização inspirou não apenas provas em matemática, mas também argumentos filosóficos sobre limites de conhecimento."
+    },
+    {
+        "id": "fact_034",
+        "kind": "dica",
+        "text": "Em exercícios de máquina de Turing, tente sempre pensar em termos de 'configurações' (estado + fita + posição de cabeça)."
+    },
+    {
+        "id": "fact_035",
+        "kind": "verdade",
+        "text": "Mesmo problemas práticos, como análise geral de vulnerabilidades de segurança, têm aspectos indecidíveis."
+    },
+    {
+        "id": "fact_036",
+        "kind": "curiosidade",
+        "text": "Muitos problemas de verificação de hardware usam fragmentos lógicos cuidadosamente escolhidos para garantir decidibilidade."
+    },
+    {
+        "id": "fact_037",
+        "kind": "dica",
+        "text": "Pratique converter problemas em linguagens formais: isso ajuda a enxergar se o problema tende a ser decidível ou não."
+    },
+    {
+        "id": "fact_038",
+        "kind": "verdade",
+        "text": "Computabilidade é uma base teórica para entender por que nem tudo pode ser automatizado, mesmo em um mundo cheio de computadores."
+    },
+    {
+        "id": "fact_039",
+        "kind": "curiosidade",
+        "text": "A noção de 'algoritmo' usada antes da computabilidade era apenas intuitiva; Turing e outros deram a primeira formalização rigorosa."
+    },
+    {
+        "id": "fact_040",
+        "kind": "dica",
+        "text": "Leia as provas devagar: em computabilidade, entender meia dúzia de provas profundas vale mais que decorar dezenas de definições."
+    }
+];
+    // Banco de Perguntas
+    const PERGUNTAS_DB = [
+    {
+        "id": "quiz_001",
+        "type": "mcq",
+        "topic": "Funções computáveis",
+        "question": "O que significa dizer que uma função f: ℕ → ℕ é computável?",
+        "options": [
+            "Que existe um programa que calcula f(n) para todo n em tempo polinomial.",
+            "Que existe uma máquina de Turing que calcula f(n) para todo n onde f está definida.",
+            "Que f sempre termina em no máximo n passos para entrada n."
+        ],
+        "correct_index": 1,
+        "explanation": "Função computável é aquela para a qual existe uma máquina de Turing que, dada a entrada n, produz f(n) sempre que f estiver definida para n."
+    },
+    {
+        "id": "quiz_002",
+        "type": "mcq",
+        "topic": "Máquinas de Turing",
+        "question": "Qual é a característica central de uma máquina de Turing determinística?",
+        "options": [
+            "Para cada par (estado, símbolo), há no máximo uma transição possível.",
+            "Ela sempre aceita todas as palavras de entrada.",
+            "Ela nunca entra em laço infinito."
+        ],
+        "correct_index": 0,
+        "explanation": "Determinística significa que a função de transição é funcional: para cada combinação (estado, símbolo) existe no máximo uma ação definida."
+    },
+    {
+        "id": "quiz_003",
+        "type": "tf",
+        "topic": "Linguagens Recursivas",
+        "question": "Toda linguagem recursiva é também recursivamente enumerável (RE).",
+        "options": ["Verdadeiro", "Falso"],
+        "correct_index": 0,
+        "explanation": "Toda linguagem decidível (recursiva) é, em particular, RE, pois podemos enumerar suas cadeias aceitas executando o decidor em todas as entradas."
+    },
+    {
+        "id": "quiz_004",
+        "type": "tf",
+        "topic": "Linguagens RE",
+        "question": "Toda linguagem recursivamente enumerável é decidível.",
+        "options": ["Verdadeiro", "Falso"],
+        "correct_index": 1,
+        "explanation": "Existem linguagens RE mas não decidíveis, como a linguagem do Problema da Parada. A MT reconhece, mas não decide em todos os casos."
+    },
+    {
+        "id": "quiz_005",
+        "type": "mcq",
+        "topic": "Problema da Parada",
+        "question": "Por que o Problema da Parada é considerado indecidível?",
+        "options": [
+            "Porque nenhuma máquina de Turing consegue simular outra máquina.",
+            "Porque não existe algoritmo que, para toda entrada, decida se um programa p para na entrada x.",
+            "Porque sempre existe um algoritmo aproximado que resolve o problema."
+        ],
+        "correct_index": 1,
+        "explanation": "A prova clássica por diagonalização mostra que não existe algoritmo geral que decida, para todo (p,x), se p pára em x."
+    },
+    {
+        "id": "quiz_006",
+        "type": "mcq",
+        "topic": "Reduções",
+        "question": "Em uma redução de linguagem A para B (A ≤m B), o que significa dizer que A é redutível a B?",
+        "options": [
+            "Que qualquer algoritmo para B pode ser convertido em algoritmo para A por uma função computável.",
+            "Que A e B são sempre iguais.",
+            "Que B é necessariamente mais simples que A."
+        ],
+        "correct_index": 0,
+        "explanation": "A ≤m B quer dizer que existe uma função computável f tal que x ∈ A se, e somente se, f(x) ∈ B. Assim, um decidor para B implica um decidor para A."
+    },
+    {
+        "id": "quiz_007",
+        "type": "tf",
+        "topic": "Teorema de Rice",
+        "question": "O Teorema de Rice afirma que qualquer propriedade semântica não trivial de programas é indecidível.",
+        "options": ["Verdadeiro", "Falso"],
+        "correct_index": 0,
+        "explanation": "Rice mostra que propriedades sobre o comportamento das funções computadas por programas (e não sobre sua sintaxe) são indecidíveis, se forem não triviais."
+    },
+    {
+        "id": "quiz_008",
+        "type": "mcq",
+        "topic": "Reconhecimento",
+        "question": "Qual é a característica de uma linguagem RE (recursivamente enumerável)?",
+        "options": [
+            "Existe uma MT que aceita todas as cadeias em tempo polinomial.",
+            "Existe uma MT que aceita as cadeias da linguagem e pode não parar para cadeias fora da linguagem.",
+            "Existe uma MT que rejeita rapidamente todas as cadeias fora da linguagem."
+        ],
+        "correct_index": 1,
+        "explanation": "Linguagens RE são reconhecidas: a máquina aceita quando a palavra está na linguagem, mas pode loopar para palavras fora dela."
+    },
+    {
+        "id": "quiz_009",
+        "type": "mcq",
+        "topic": "co-RE",
+        "question": "Uma linguagem L é co-RE quando:",
+        "options": [
+            "Seu complemento é RE.",
+            "Ela é ao mesmo tempo RE e recursiva.",
+            "Ela é finita."
+        ],
+        "correct_index": 0,
+        "explanation": "Definição: L é co-RE se o complemento de L é recursivamente enumerável."
+    },
+    {
+        "id": "quiz_010",
+        "type": "tf",
+        "topic": "Classe RE ∩ co-RE",
+        "question": "Se uma linguagem é RE e co-RE, então ela é decidível.",
+        "options": ["Verdadeiro", "Falso"],
+        "correct_index": 0,
+        "explanation": "Se tanto L quanto seu complemento são RE, podemos rodar as duas MTs em paralelo. Uma delas deve aceitar, decidindo assim L."
+    },
+    {
+        "id": "quiz_011",
+        "type": "mcq",
+        "topic": "Máquinas de Turing",
+        "question": "Qual das alternativas NÃO é uma variação equivalente de máquina de Turing padrão?",
+        "options": [
+            "Máquina de Turing com múltiplas fitas.",
+            "Máquina de Turing probabilística com oráculo para problemas não computáveis.",
+            "Máquina de Turing com alfabeto maior que {0,1}."
+        ],
+        "correct_index": 1,
+        "explanation": "Máquinas com múltiplas fitas ou alfabetos maiores são equivalentes em poder computacional; já uma MT com oráculo pode ir além da computabilidade clássica."
+    },
+    {
+        "id": "quiz_012",
+        "type": "mcq",
+        "topic": "Problema da equivalência",
+        "question": "O problema de decidir se dois programas sempre produzem a mesma saída para todas as entradas é:",
+        "options": [
+            "Decidível.",
+            "Indecidível, por consequência de resultados como Rice.",
+            "Decidível apenas para programas em linguagens funcionais."
+        ],
+        "correct_index": 1,
+        "explanation": "Equivalência de programas é um exemplo clássico de propriedade semântica não trivial, logo indecidível pelo Teorema de Rice."
+    },
+    {
+        "id": "quiz_013",
+        "type": "tf",
+        "topic": "Linguagens Regulares x Computabilidade",
+        "question": "Toda linguagem regular é decidível por uma máquina de Turing.",
+        "options": ["Verdadeiro", "Falso"],
+        "correct_index": 0,
+        "explanation": "AFNs e AFs determinísticos podem ser simulados por uma MT, logo linguagens regulares são decidíveis."
+    },
+    {
+        "id": "quiz_014",
+        "type": "mcq",
+        "topic": "Post Correspondence Problem (PCP)",
+        "question": "O PCP (Problema da Correspondência de Post) é:",
+        "options": [
+            "Um problema decidível usado para testar autômatos.",
+            "Um problema indecidível usado como base para reduções.",
+            "Um problema de otimização em grafos."
+        ],
+        "correct_index": 1,
+        "explanation": "PCP é indecidível e frequentemente usado como problema-fonte em provas de indecidibilidade via redução."
+    },
+    {
+        "id": "quiz_015",
+        "type": "mcq",
+        "topic": "Diagonalização",
+        "question": "A técnica de diagonalização foi usada originalmente para:",
+        "options": [
+            "Provar a indecidibilidade do Problema da Parada.",
+            "Mostrar que o conjunto dos números reais é não enumerável.",
+            "Caracterizar linguagens regulares."
+        ],
+        "correct_index": 1,
+        "explanation": "Cantor usou diagonalização para provar que ℝ é não enumerável; a ideia foi adaptada em computabilidade."
+    },
+    {
+        "id": "quiz_016",
+        "type": "tf",
+        "topic": "Funções parciais",
+        "question": "Funções computáveis podem ser parciais, isto é, não definidas para toda entrada.",
+        "options": ["Verdadeiro", "Falso"],
+        "correct_index": 0,
+        "explanation": "Muitas funções computáveis são modeladas como parciais, pois o programa pode não parar para certas entradas."
+    },
+    {
+        "id": "quiz_017",
+        "type": "mcq",
+        "topic": "Complexidade vs Computabilidade",
+        "question": "O que diferencia complexidade de computabilidade?",
+        "options": [
+            "Computabilidade pergunta 'o que é possível computar'; complexidade pergunta 'com que custo'.",
+            "Complexidade foca apenas em memória; computabilidade, apenas em tempo.",
+            "São exatamente a mesma área, com nomes diferentes."
+        ],
+        "correct_index": 0,
+        "explanation": "Computabilidade se preocupa com a existência de algoritmos; complexidade estuda recursos necessários (tempo, espaço, etc.)."
+    },
+    {
+        "id": "quiz_018",
+        "type": "mcq",
+        "topic": "Funções de parada",
+        "question": "Por que não existe uma função computável total que diga se qualquer programa p pára na entrada x?",
+        "options": [
+            "Porque não sabemos descrever programas formalmente.",
+            "Porque a prova do Problema da Parada mostra contradição ao assumir tal função.",
+            "Porque programas podem ser muito grandes."
+        ],
+        "correct_index": 1,
+        "explanation": "Supondo tal função total, podemos construir um programa que gera comportamento contraditório, provando que essa função não pode ser computável."
+    },
+    {
+        "id": "quiz_019",
+        "type": "tf",
+        "topic": "Enumerabilidade",
+        "question": "O conjunto de todos os programas possíveis é enumerável.",
+        "options": ["Verdadeiro", "Falso"],
+        "correct_index": 0,
+        "explanation": "Programas podem ser codificados como cadeias finitas sobre um alfabeto finito, e cadeias finitas formam um conjunto enumerável."
+    },
+    {
+        "id": "quiz_020",
+        "type": "mcq",
+        "topic": "Linguagens não RE",
+        "question": "Uma linguagem que não é RE:",
+        "options": [
+            "Não pode ser reconhecida nem parcialmente por nenhuma MT.",
+            "É sempre finita.",
+            "Pode ser decidida por MT não determinística."
+        ],
+        "correct_index": 0,
+        "explanation": "Linguagens não RE não são reconhecíveis: não existe MT que aceite exatamente suas cadeias, nem mesmo permitindo laços para fora da linguagem."
+    }
+];
+
+    /* --- ESTADO DO JOGO --- */
+    let indiceAtual = 0;
+    let movimentoEmAndamento = false;
+    let passosPendentes = 0;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      inicializarTabuleiro();
+      
+      // Inicializa a peça
+      const celulas = document.querySelectorAll(".cell");
+      const peca = document.createElement("div");
+      peca.classList.add("piece");
+      peca.id = "piece-main";
+      celulas[indiceAtual].appendChild(peca);
+
+      // Eventos
+      document.getElementById("btn-roll").addEventListener("click", rolarDoisDados);
+      document.getElementById("dice-confirm").addEventListener("click", () => {
+        fecharModal("dice-modal");
+        if (passosPendentes > 0) moverPeao(passosPendentes);
+      });
+      document.getElementById("dice-close").addEventListener("click", () => fecharModal("dice-modal"));
+
+      // Eventos do Quiz
+      document.getElementById("question-confirm").addEventListener("click", verificarRespostaQuiz);
+      document.getElementById("question-close").addEventListener("click", () => {
+          fecharModal("question-modal");
+          document.getElementById("question-confirm").classList.remove("hidden");
+          document.getElementById("question-close").classList.add("hidden");
+      });
+
+      // Eventos da Dica
+      document.getElementById("tip-close").addEventListener("click", () => fecharModal("tip-modal"));
+    });
+
+    function inicializarTabuleiro() {
+        const celulas = document.querySelectorAll(".cell");
+        celulas.forEach(cell => {
+            const idx = parseInt(cell.getAttribute('data-index'));
+            if (REGRAS[idx] === 'quiz') {
+                cell.classList.add('cell-quiz');
+                cell.title = "Casa de Pergunta";
+            } else if (REGRAS[idx] === 'dica') {
+                cell.classList.add('cell-tip');
+                cell.title = "Casa de Dica";
+            }
+        });
+    }
+
+    /* --- LÓGICA DO JOGO --- */
+
+    function rolarDado() { return Math.floor(Math.random() * 6) + 1; }
+
+    function rolarDoisDados() {
+      if (movimentoEmAndamento) return;
+
+      const d1 = rolarDado();
+      const d2 = rolarDado();
+      const soma = d1 + d2;
+      passosPendentes = soma;
+
+      const textoModal = document.getElementById("dice-text");
+      textoModal.innerHTML = `Dado 1: ${d1} • Dado 2: ${d2} <br> <span style="font-size: 1.4em">Soma: ${soma}</span>`;
+      const textoSidebar = document.getElementById("dice-last");
+      textoSidebar.textContent = `D1: ${d1} + D2: ${d2} = ${soma}`;
+
+      abrirModal("dice-modal");
+    }
+
+    function atualizarPosicaoPeao(index) {
+      const celulas = document.querySelectorAll(".cell");
+      const peca = document.getElementById("piece-main");
+      celulas[index].appendChild(peca);
+      peca.classList.remove("hop");
+      void peca.offsetWidth; // Trigger reflow
+      peca.classList.add("hop");
+    }
+
+    function moverPeao(passos) {
+      if (movimentoEmAndamento) return;
+      movimentoEmAndamento = true;
+      let restantes = passos;
+
+      function andarUmPasso() {
+        if (restantes <= 0) {
+          movimentoEmAndamento = false;
+          // Verificação importante: Onde paramos?
+          verificarCasaEspecial(indiceAtual);
+          return;
+        }
+
+        indiceAtual = (indiceAtual + 1) % TOTAL_CASAS;
+        atualizarPosicaoPeao(indiceAtual);
+
+        restantes--;
+        setTimeout(andarUmPasso, 300);
+      }
+      andarUmPasso();
+    }
+
+    /* --- LÓGICA DAS REGRAS --- */
+
+    function verificarCasaEspecial(index) {
+        const tipo = REGRAS[index];
+        if (tipo === 'quiz') {
+            setTimeout(() => abrirQuiz(), 500);
+        } else if (tipo === 'dica') {
+            setTimeout(() => abrirDica(), 500);
+        }
+    }
+
+    function abrirDica() {
+        const dicaAleatoria = DICAS_DB[Math.floor(Math.random() * DICAS_DB.length)];
+        document.getElementById("tip-text").textContent = dicaAleatoria;
+        abrirModal("tip-modal");
+    }
+
+    function abrirQuiz() {
+        // Sorteia pergunta
+        const p = PERGUNTAS_DB[Math.floor(Math.random() * PERGUNTAS_DB.length)];
+        
+        document.getElementById("question-text").textContent = p.pergunta;
+        const optionsDiv = document.getElementById("question-options");
+        optionsDiv.innerHTML = ""; // Limpa anteriores
+
+        // Limpa feedback
+        const feedbackEl = document.getElementById("question-feedback");
+        feedbackEl.textContent = "";
+        feedbackEl.className = "question-feedback";
+
+        // Gera botões
+        p.opcoes.forEach((texto, idx) => {
+            const btn = document.createElement("button");
+            btn.className = "option";
+            btn.textContent = texto;
+            btn.dataset.correct = (idx === p.correta); // Marca se é a correta
+            
+            btn.addEventListener("click", () => {
+                // Remove seleção dos outros
+                document.querySelectorAll("#question-options .option").forEach(b => b.classList.remove("selected"));
+                btn.classList.add("selected");
+            });
+            optionsDiv.appendChild(btn);
+        });
+
+        // Botões do footer
+        document.getElementById("question-confirm").classList.remove("hidden");
+        document.getElementById("question-close").classList.add("hidden");
+
+        abrirModal("question-modal");
+    }
+
+    function verificarRespostaQuiz() {
+        const options = document.querySelectorAll("#question-options .option");
+        const feedbackEl = document.getElementById("question-feedback");
+        
+        const selecionada = Array.from(options).find(btn => btn.classList.contains("selected"));
+
+        if (!selecionada) {
+            feedbackEl.textContent = "Escolha uma opção!";
+            feedbackEl.classList.add("error");
+            return;
+        }
+
+        const acertou = selecionada.dataset.correct === "true";
+        
+        if (acertou) {
+            feedbackEl.textContent = "Correto! 🎉";
+            feedbackEl.classList.remove("error");
+            feedbackEl.classList.add("ok");
+            // Pinta a opção de verde
+            selecionada.style.borderColor = "#10b981";
+            selecionada.style.backgroundColor = "#d1fae5";
+        } else {
+            feedbackEl.textContent = "Ops! Resposta errada.";
+            feedbackEl.classList.remove("ok");
+            feedbackEl.classList.add("error");
+            selecionada.style.borderColor = "#ef476f";
+            selecionada.style.backgroundColor = "#ffe5ec";
+        }
+
+        // Troca botão para "Continuar"
+        document.getElementById("question-confirm").classList.add("hidden");
+        document.getElementById("question-close").classList.remove("hidden");
+    }
+
+    /* --- UTILITÁRIOS --- */
+    function abrirModal(id) {
+      document.getElementById(id).classList.remove("hidden");
+    }
+    function fecharModal(id) {
+      document.getElementById(id).classList.add("hidden");
+    }
+  </script>
+</body>
+</html>
+<script>
+const API = "http://127.0.0.1:8000";
+let SESSION_ID = null;
+let CURRENT_CHALLENGE = null;
+let EXAM_INDEX = 0;
+
+/* ===========================
+   INICIAR SESSÃO
+=========================== */
+async function iniciarSessao() {
+  const nome = document.getElementById("player-name").value.trim();
+  if (!nome) {
+    alert("Digite seu nome.");
+    return;
+  }
+
+  const resp = await fetch(API + "/launch", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({user: nome})
+  });
+
+  const data = await resp.json();
+  SESSION_ID = data.session_id;
+  alert("Sessão iniciada!");
+}
+
+/* ===========================
+   OBTER PRÓXIMO DESAFIO
+=========================== */
+async function obterDesafio() {
+  const resp = await fetch(API + "/next_challenge");
+  const data = await resp.json();
+  CURRENT_CHALLENGE = data;
+  return data;
+}
+
+/* ===========================
+   AO CAIR EM UMA CASA
+=========================== */
+async function verificarCasaEspecial(index){
+    const tipo = REGRAS[index];
+
+    if(tipo === "quiz"){
+        const desafio = await obterDesafio();
+
+        if(desafio.type === "quiz") abrirQuizBackend(desafio);
+        else if(desafio.type === "exam") abrirProvaBackend(desafio);
+        else console.warn("FACT ignorado em casa de quiz");
+    }
+
+    if(tipo === "dica"){
+        const desafio = await obterDesafio();
+
+        if(desafio.type === "fact") abrirDicaFromFact(desafio);
+        else console.warn("QUIZ/EXAM ignorado em casa de dica");
+    }
+}
+
+/* ===========================
+   DICAS (FACT_BANK)
+=========================== */
+function abrirDicaFromFact(fact) {
+  document.getElementById("tip-text").textContent = fact.text;
+  abrirModal("tip-modal");
+}
+
+/* ===========================
+   QUIZ (QUIZ_BANK)
+=========================== */
+function abrirQuizBackend(ch) {
+  CURRENT_CHALLENGE = ch;
+
+  document.getElementById("question-text").textContent = ch.question;
+
+  const optBox = document.getElementById("question-options");
+  optBox.innerHTML = "";
+
+  ch.options.forEach((opcao, idx) => {
+    const btn = document.createElement("button");
+    btn.className = "option";
+    btn.textContent = opcao;
+    btn.dataset.answerIndex = idx;
+
+    btn.onclick = () => {
+      document.querySelectorAll(".option").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+    };
+
+    optBox.appendChild(btn);
+  });
+
+  document.getElementById("question-feedback").textContent = "";
+  document.getElementById("question-confirm").classList.remove("hidden");
+  document.getElementById("question-close").classList.add("hidden");
+
+  abrirModal("question-modal");
+}
+
+/* Enviar quiz ao backend */
+async function verificarRespostaQuizBackend() {
+  const selecionada = document.querySelector(".option.selected");
+  const fb = document.getElementById("question-feedback");
+
+  if (!selecionada) {
+    fb.textContent = "Escolha uma alternativa!";
+    fb.classList.add("error");
+    return;
+  }
+
+  const answer = parseInt(selecionada.dataset.answerIndex);
+  const payloadId = CURRENT_CHALLENGE.payload_id;
+
+  const resp = await fetch(API + "/score", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      session_id: SESSION_ID,
+      payload_id: payloadId,
+      answer: answer
+    })
+  });
+
+  const data = await resp.json();
+
+  fb.textContent = data.correct ? `Correto! +${data.delta}` : "Incorreto.";
+  fb.className = data.correct ? "question-feedback ok" : "question-feedback error";
+
+  document.getElementById("question-confirm").classList.add("hidden");
+  document.getElementById("question-close").classList.remove("hidden");
+}
+
+/* ===========================
+   PROVA (EXAM_BANK)
+=========================== */
+function abrirProvaBackend(exam) {
+  CURRENT_CHALLENGE = exam;
+  EXAM_INDEX = 0;
+  mostrarQuestaoProva();
+}
+
+function mostrarQuestaoProva() {
+  const exam = CURRENT_CHALLENGE;
+  const q = exam.questions[EXAM_INDEX];
+
+  document.getElementById("question-text").textContent =
+    `(${EXAM_INDEX+1}/${exam.questions.length}) ${q.question}`;
+
+  const optBox = document.getElementById("question-options");
+  optBox.innerHTML = "";
+
+  q.options.forEach((op, idx) => {
+    const btn = document.createElement("button");
+    btn.className = "option";
+    btn.textContent = op;
+    btn.dataset.answerIndex = idx;
+    btn.dataset.payloadId = q.payload_id;
+
+    btn.onclick = () => {
+      document.querySelectorAll(".option").forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
+    };
+
+    optBox.appendChild(btn);
+  });
+
+  document.getElementById("question-confirm").classList.remove("hidden");
+  document.getElementById("question-close").classList.add("hidden");
+
+  abrirModal("question-modal");
+}
+
+async function verificarRespostaQuizBackend() {
+  const selecionada = document.querySelector(".option.selected");
+  const fb = document.getElementById("question-feedback");
+
+  if (!selecionada) {
+    fb.textContent = "Escolha uma alternativa!";
+    fb.classList.add("error");
+    return;
+  }
+
+  const answer = parseInt(selecionada.dataset.answerIndex);
+  const payloadId =
+    CURRENT_CHALLENGE.type === "quiz"
+    ? CURRENT_CHALLENGE.payload_id
+    : CURRENT_CHALLENGE.questions[EXAM_INDEX].payload_id;
+
+  const resp = await fetch(API + "/score", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({
+      session_id: SESSION_ID,
+      payload_id: payloadId,
+      answer: answer
+    })
+  });
+
+  const data = await resp.json();
+  fb.textContent = data.correct ? `Correto! +${data.delta}` : "Incorreto.";
+
+  // Caso seja prova → próxima questão
+  if (CURRENT_CHALLENGE.type === "exam") {
+    EXAM_INDEX++;
+    if (EXAM_INDEX < CURRENT_CHALLENGE.questions.length) {
+      setTimeout(mostrarQuestaoProva, 800);
+      return;
+    }
+  }
+
+  document.getElementById("question-confirm").classList.add("hidden");
+  document.getElementById("question-close").classList.remove("hidden");
+}
+</script>

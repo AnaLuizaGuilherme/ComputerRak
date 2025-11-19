@@ -1,0 +1,382 @@
+[
+    {
+        "id": "exam_001",
+        "title": "Prova 1 — Fundamentos de Computabilidade",
+        "questions": [
+            {
+                "id": "exam_001_q1",
+                "type": "mcq",
+                "question": "Qual é o modelo formal mais usado como base da computabilidade?",
+                "options": [
+                    "Máquinas de Turing",
+                    "Autômatos de Pilha",
+                    "Redes de Petri"
+                ],
+                "correct_index": 0,
+                "explanation": "Máquinas de Turing são o modelo clássico adotado para definir computabilidade."
+            },
+            {
+                "id": "exam_001_q2",
+                "type": "tf",
+                "question": "Uma função computável sempre pode ser implementada em qualquer linguagem de programação de uso geral.",
+                "options": ["Verdadeiro", "Falso"],
+                "correct_index": 0,
+                "explanation": "Linguagens de programação usuais são consideradas Turing-completas."
+            },
+            {
+                "id": "exam_001_q3",
+                "type": "mcq",
+                "question": "O que significa a Tese de Church–Turing?",
+                "options": [
+                    "Que toda função matemática é computável.",
+                    "Que toda função efetivamente calculável pode ser computada por uma MT.",
+                    "Que MT são mais poderosas que linguagens de programação."
+                ],
+                "correct_index": 1,
+                "explanation": "A tese liga a noção informal de 'efetivamente calculável' ao modelo formal de MT."
+            }
+        ]
+    },
+    {
+        "id": "exam_002",
+        "title": "Prova 2 — Linguagens RE e co-RE",
+        "questions": [
+            {
+                "id": "exam_002_q1",
+                "type": "mcq",
+                "question": "Se L é RE mas não recursiva, o que pode acontecer com a MT que reconhece L?",
+                "options": [
+                    "Ela sempre para, aceitando ou rejeitando.",
+                    "Ela pode entrar em laço infinito para entradas fora de L.",
+                    "Ela nunca aceita palavras de L."
+                ],
+                "correct_index": 1,
+                "explanation": "Reconhecer permite loop para palavras fora da linguagem."
+            },
+            {
+                "id": "exam_002_q2",
+                "type": "tf",
+                "question": "Se L é RE e seu complemento também é RE, então L é recursiva.",
+                "options": ["Verdadeiro", "Falso"],
+                "correct_index": 0,
+                "explanation": "Rodamos os dois reconhecedores em paralelo e decidimos L."
+            },
+            {
+                "id": "exam_002_q3",
+                "type": "mcq",
+                "question": "Uma linguagem que não é RE:",
+                "options": [
+                    "Pode ter um semi-decididor.",
+                    "Não tem semi-decididor.",
+                    "É necessariamente finita."
+                ],
+                "correct_index": 1,
+                "explanation": "Não-RE significa não reconhecível por nenhuma MT."
+            }
+        ]
+    },
+    {
+        "id": "exam_003",
+        "title": "Prova 3 — Problema da Parada",
+        "questions": [
+            {
+                "id": "exam_003_q1",
+                "type": "mcq",
+                "question": "O que a prova do Problema da Parada mostra?",
+                "options": [
+                    "Que nenhuma MT consegue simular outra MT.",
+                    "Que não existe algoritmo geral para decidir parada de programas.",
+                    "Que MT não são modelos adequados de computação."
+                ],
+                "correct_index": 1,
+                "explanation": "A prova é por contradição, usando diagonalização e auto-referência."
+            },
+            {
+                "id": "exam_003_q2",
+                "type": "tf",
+                "question": "O Problema da Parada é indecidível, mas é RE.",
+                "options": ["Verdadeiro", "Falso"],
+                "correct_index": 0,
+                "explanation": "É RE pois podemos simular o programa e aceitar se ele parar."
+            },
+            {
+                "id": "exam_003_q3",
+                "type": "mcq",
+                "question": "Qual é a estratégia geral para mostrar indecidibilidade usando o Problema da Parada?",
+                "options": [
+                    "Reduzir o problema alvo ao Problema da Parada.",
+                    "Reduzir o Problema da Parada ao problema alvo.",
+                    "Exibir um algoritmo parcial para o problema alvo."
+                ],
+                "correct_index": 1,
+                "explanation": "Mostramos que, se o problema alvo fosse decidível, o Problema da Parada também seria, o que é impossível."
+            }
+        ]
+    },
+    {
+        "id": "exam_004",
+        "title": "Prova 4 — Teorema de Rice",
+        "questions": [
+            {
+                "id": "exam_004_q1",
+                "type": "mcq",
+                "question": "O Teorema de Rice trata de propriedades:",
+                "options": [
+                    "Sintáticas de programas.",
+                    "Semânticas das funções que os programas computam.",
+                    "Sobre o tempo de execução de algoritmos."
+                ],
+                "correct_index": 1,
+                "explanation": "Rice é específico sobre propriedades semânticas."
+            },
+            {
+                "id": "exam_004_q2",
+                "type": "tf",
+                "question": "Segundo Rice, qualquer propriedade semântica não trivial de linguagens de programas é indecidível.",
+                "options": ["Verdadeiro", "Falso"],
+                "correct_index": 0,
+                "explanation": "Não trivial = vale para alguns programas e não para outros."
+            },
+            {
+                "id": "exam_004_q3",
+                "type": "mcq",
+                "question": "Qual das propriedades abaixo é um exemplo típico coberto por Rice?",
+                "options": [
+                    "O código-fonte tem mais de 100 linhas.",
+                    "O programa imprime algum output para alguma entrada.",
+                    "O programa é escrito em Python."
+                ],
+                "correct_index": 1,
+                "explanation": "A propriedade se refere ao comportamento da função computada, não à forma do código."
+            }
+        ]
+    },
+    {
+        "id": "exam_005",
+        "title": "Prova 5 — PCP e Reduções",
+        "questions": [
+            {
+                "id": "exam_005_q1",
+                "type": "mcq",
+                "question": "O PCP (Post Correspondence Problem) é usado principalmente para:",
+                "options": [
+                    "Projetar automatos determinísticos.",
+                    "Provar indecidibilidade por reduções.",
+                    "Projetar algoritmos de ordenação."
+                ],
+                "correct_index": 1,
+                "explanation": "PCP é indecidível e serve como base para reduções."
+            },
+            {
+                "id": "exam_005_q2",
+                "type": "tf",
+                "question": "Uma redução A ≤m B preserva decidibilidade: se B é decidível, então A também é.",
+                "options": ["Verdadeiro", "Falso"],
+                "correct_index": 0,
+                "explanation": "Podemos decidir A chamando o decidor para B após transformar a entrada."
+            },
+            {
+                "id": "exam_005_q3",
+                "type": "mcq",
+                "question": "Se A ≤m B e A é indecidível, qual afirmativa é correta?",
+                "options": [
+                    "B deve ser indecidível ou mais difícil.",
+                    "B pode ser decidível sem contradição.",
+                    "A redução não fornece informação útil."
+                ],
+                "correct_index": 0,
+                "explanation": "Se B fosse decidível, A também seria, contradizendo a indecidibilidade de A."
+            }
+        ]
+    },
+    {
+        "id": "exam_006",
+        "title": "Prova 6 — Linguagens Regulares e MT",
+        "questions": [
+            {
+                "id": "exam_006_q1",
+                "type": "tf",
+                "question": "Toda linguagem regular pode ser decidida por uma máquina de Turing.",
+                "options": ["Verdadeiro", "Falso"],
+                "correct_index": 0,
+                "explanation": "AFDs/AFNs são simuláveis por MTs."
+            },
+            {
+                "id": "exam_006_q2",
+                "type": "mcq",
+                "question": "Qual das linguagens abaixo é certamente decidível?",
+                "options": [
+                    "A linguagem de todas as fórmulas verdadeiras da aritmética de primeira ordem.",
+                    "Linguagens reconhecidas por um autômato finito determinístico.",
+                    "Linguagens associadas ao Problema da Parada."
+                ],
+                "correct_index": 1,
+                "explanation": "Linguagens regulares são decidíveis por AF/MT."
+            },
+            {
+                "id": "exam_006_q3",
+                "type": "mcq",
+                "question": "Por que estudamos autômatos mesmo tendo máquinas de Turing?",
+                "options": [
+                    "Porque MT não são formais.",
+                    "Porque autômatos são mais fracos e, portanto, mais fáceis de analisar em certas classes de problemas.",
+                    "Porque autômatos não podem ser implementados."
+                ],
+                "correct_index": 1,
+                "explanation": "Modelos mais simples ajudam a caracterizar sub-classes (regulares, livres de contexto etc.)."
+            }
+        ]
+    },
+    {
+        "id": "exam_007",
+        "title": "Prova 7 — Diagonalização",
+        "questions": [
+            {
+                "id": "exam_007_q1",
+                "type": "mcq",
+                "question": "A diagonalização é frequentemente usada para:",
+                "options": [
+                    "Provar que certos conjuntos são não enumeráveis.",
+                    "Provar que todo conjunto é enumerável.",
+                    "Provar que todo programa termina."
+                ],
+                "correct_index": 0,
+                "explanation": "Diagonalização mostra que não há enumeração completa para certos conjuntos."
+            },
+            {
+                "id": "exam_007_q2",
+                "type": "tf",
+                "question": "A ideia de diagonalizar envolve construir um objeto que difere de todos os objetos de uma lista em pelo menos uma posição.",
+                "options": ["Verdadeiro", "Falso"],
+                "correct_index": 0,
+                "explanation": "Essa é exatamente a ideia central da técnica."
+            },
+            {
+                "id": "exam_007_q3",
+                "type": "mcq",
+                "question": "Na prova da indecidibilidade do Problema da Parada, a diagonalização é combinada com:",
+                "options": [
+                    "Codificações de programas como números naturais.",
+                    "Autômatos celulares.",
+                    "Gramáticas livres de contexto."
+                ],
+                "correct_index": 0,
+                "explanation": "Codificamos programas e usamos auto-referência para obter contradição."
+            }
+        ]
+    },
+    {
+        "id": "exam_008",
+        "title": "Prova 8 — Modelos Equivalentes",
+        "questions": [
+            {
+                "id": "exam_008_q1",
+                "type": "mcq",
+                "question": "Qual dos modelos abaixo é considerado equivalente em poder às máquinas de Turing?",
+                "options": [
+                    "Máquinas RAM (Random Access Machine).",
+                    "Autômatos finitos determinísticos.",
+                    "Expressões regulares puras."
+                ],
+                "correct_index": 0,
+                "explanation": "Máquinas RAM são um modelo mais próximo de computadores reais, mas Turing-completas."
+            },
+            {
+                "id": "exam_008_q2",
+                "type": "tf",
+                "question": "A maioria das linguagens de programação de propósito geral é Turing-completa.",
+                "options": ["Verdadeiro", "Falso"],
+                "correct_index": 0,
+                "explanation": "Com recursão ou laços, geralmente atingem Turing-completude."
+            },
+            {
+                "id": "exam_008_q3",
+                "type": "mcq",
+                "question": "Por que usamos a noção de Turing-completude?",
+                "options": [
+                    "Para saber se uma linguagem pode expressar qualquer função computável.",
+                    "Para saber se a linguagem é eficiente.",
+                    "Para saber se a linguagem é amigável ao usuário."
+                ],
+                "correct_index": 0,
+                "explanation": "Turing-completude garante poder expressivo máximo dentro da computabilidade clássica."
+            }
+        ]
+    },
+    {
+        "id": "exam_009",
+        "title": "Prova 9 — Funções Computáveis",
+        "questions": [
+            {
+                "id": "exam_009_q1",
+                "type": "tf",
+                "question": "Toda função total computável sobre ℕ pode ser calculada por uma máquina de Turing.",
+                "options": ["Verdadeiro", "Falso"],
+                "correct_index": 0,
+                "explanation": "Esse é o espírito da Tese de Church–Turing."
+            },
+            {
+                "id": "exam_009_q2",
+                "type": "mcq",
+                "question": "Qual é um exemplo de função não computável?",
+                "options": [
+                    "Função identidade f(n) = n.",
+                    "Função de parada que diz se um programa p pára em x.",
+                    "Função que soma dois números naturais."
+                ],
+                "correct_index": 1,
+                "explanation": "A função que 'resolve' o Problema da Parada é não computável."
+            },
+            {
+                "id": "exam_009_q3",
+                "type": "mcq",
+                "question": "Uma função parcial computável pode ser vista como:",
+                "options": [
+                    "Uma função total com um valor especial para indefinido.",
+                    "Uma função que sempre para.",
+                    "Uma função que nunca pode ser aproximada."
+                ],
+                "correct_index": 0,
+                "explanation": "Modelamos indefinição como 'não terminar' para certas entradas."
+            }
+        ]
+    },
+    {
+        "id": "exam_010",
+        "title": "Prova 10 — Relação Computabilidade e Complexidade",
+        "questions": [
+            {
+                "id": "exam_010_q1",
+                "type": "mcq",
+                "question": "Computabilidade responde principalmente a qual pergunta?",
+                "options": [
+                    "Quanto tempo um algoritmo leva.",
+                    "Quanto espaço um algoritmo usa.",
+                    "Se existe ou não algoritmo para um problema."
+                ],
+                "correct_index": 2,
+                "explanation": "É sobre 'existência' de algoritmos, não sobre custo."
+            },
+            {
+                "id": "exam_010_q2",
+                "type": "tf",
+                "question": "Se um problema é indecidível, ele não pertence a nenhuma classe de complexidade como P ou NP.",
+                "options": ["Verdadeiro", "Falso"],
+                "correct_index": 0,
+                "explanation": "Classes P, NP etc. assumem decidibilidade de entrada/saída."
+            },
+            {
+                "id": "exam_010_q3",
+                "type": "mcq",
+                "question": "Um problema em P é, por definição:",
+                "options": [
+                    "Decidível em tempo polinomial.",
+                    "Reconhecido mas não decidido.",
+                    "Indecidível."
+                ],
+                "correct_index": 0,
+                "explanation": "P é a classe de problemas decidíveis em tempo polinomial por MT determinística."
+            }
+        ]
+    }
+]
